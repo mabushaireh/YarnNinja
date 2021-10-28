@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {},
+      "distributionName": ""
+    },
+    "Debug With AppPath": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1633098813071_0260.log\""
+    },
+    "Debug without AppPath": {
+      "commandName": "Project"
+    },
+    "Debug with Wrong Path": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\wrong path.log\""
+    }
+  }
+}
