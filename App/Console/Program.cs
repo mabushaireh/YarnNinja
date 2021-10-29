@@ -18,7 +18,6 @@ namespace YarnNinja.App.Console
     }
     class Program
     {
-        private static string yarnLogText = "";
         private static Window win = new Window("YarnNinja")
         {
             X = 0,
@@ -26,11 +25,13 @@ namespace YarnNinja.App.Console
 
             // By using Dim.Fill(), it will automatically resize without manual intervention
             Width = Dim.Fill(),
-            Height = Dim.Fill()
+            Height = Dim.Fill(),
+            ColorScheme = Colors.TopLevel
         };
 
-        private static YarnApplication app = null;
-        private static ListView lstVewContainers = null;
+        private static YarnApplication? app = null;
+
+        private static ListView? lstVewContainers = null;
 
         static async Task Main(string[] args)
         {
@@ -64,6 +65,7 @@ namespace YarnNinja.App.Console
 
             top.Add(statusBar);
 
+
             if (args.Length > 0)
             {
                 var path = args[0];
@@ -73,8 +75,10 @@ namespace YarnNinja.App.Console
                     return;
                 }
 
-                OpenAsync(File.ReadAllText(path), new FileInfo(path), Path.GetFileName(path));
+                OpenAsync(File.ReadAllText(path));
             }
+
+
             Application.Run();
 
 
@@ -82,25 +86,22 @@ namespace YarnNinja.App.Console
 
         static async Task RefreshYarnAppInfo()
         {
-            var header = new Window("Yarn Application Info")
+            var header = new FrameView("Yarn Application Info")
             {
-                X = 0,
-                Y = 1, // Leave one row for the toplevel menu
-
-                // By using Dim.Fill(), it will automatically resize without manual intervention
-                Width = Dim.Fill(),
-                Height = Dim.Sized(7)
+                X = Pos.Center(),
+                Y = 0,
+                Width = Dim.Percent(100),
+                Height = Dim.Sized(6)
             };
 
 
             var tableView = new TableView()
             {
-                Table = await BuildHeaderAsync(2, 2),
-                MultiSelect = true,
+                Table = await BuildHeaderAsync(),
                 Width = Dim.Fill(),
-                Height = Dim.Fill(1),
+                Height = Dim.Sized(6),
             };
-            tableView.Style.ExpandLastColumn = false;
+            tableView.Style.ExpandLastColumn = true;
 
 
             header.Add(tableView);
@@ -108,21 +109,21 @@ namespace YarnNinja.App.Console
             var workernodes = new Window("Workers")
             {
                 X = 0,
-                Y = 8,
+                Y = 6,
 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
-                Height = Dim.Fill()
+                Height = Dim.Sized(10)
             };
 
-           
+
 
             var lstVewWorkerNodes = new ListView()
             {
                 X = 0,
                 Y = 0,
                 Height = Dim.Fill(),
-                Width = Dim.Sized(10),
+                Width = Dim.Fill(),
                 AllowsMarking = false,
                 AllowsMultipleSelection = false
             };
@@ -160,15 +161,17 @@ namespace YarnNinja.App.Console
                 _scrollBar.Refresh();
             };
 
-            lstVewWorkerNodes.SetSource((await BuildWorkerNodesTableAsync()).OrderBy(t => t).ToList());
+            var workers = app.WorkerNodes.OrderBy(t => t).ToList();
+            workers.Insert(0, "ALL");
+            lstVewWorkerNodes.SetSource(workers);
 
-            lstVewWorkerNodes.SelectedItemChanged += LstVewWorkerNodes_SelectedItemChanged;
+
             workernodes.Add(lstVewWorkerNodes);
 
             var containers = new Window("Containers")
             {
                 X = 0,
-                Y = 20,
+                Y = 16,
 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
@@ -186,61 +189,148 @@ namespace YarnNinja.App.Console
 
             containers.Add(lstVewContainers);
 
-            win.Add(header);
-            win.Add(workernodes);
-            win.Add(containers);
-        }
+            string applicatgionMasterId = "NA";
 
-        private static void LstVewWorkerNodes_SelectedItemChanged(ListViewItemEventArgs obj)
-        {
-            var _scrollBar = new ScrollBarView(lstVewContainers, true);
-
-            _scrollBar.ChangedPosition += () =>
+            if (app.ApplicationMaster is not null)
             {
-                lstVewContainers.TopItem = _scrollBar.Position;
-                if (lstVewContainers.TopItem != _scrollBar.Position)
-                {
-                    _scrollBar.Position = lstVewContainers.TopItem;
-                }
-                lstVewContainers.SetNeedsDisplay();
-            };
+                applicatgionMasterId = app.ApplicationMaster.Id;
+            }
 
-            _scrollBar.OtherScrollBarView.ChangedPosition += () =>
+
+            lstVewContainers.SetSource(app.Containers.OrderBy(t => t.Id).Select(p =>
             {
-                lstVewContainers.LeftItem = _scrollBar.OtherScrollBarView.Position;
-                if (lstVewContainers.LeftItem != _scrollBar.OtherScrollBarView.Position)
+                var postfix = "";
+                if (p.Id.Equals(applicatgionMasterId))
+                    postfix = "*";
+
+                return $"{p.Id}{postfix}";
+            }).ToList());
+
+
+            var _scrollBarContainers = new ScrollBarView(lstVewContainers, true);
+
+            _scrollBarContainers.ChangedPosition += () =>
                 {
-                    _scrollBar.OtherScrollBarView.Position = lstVewContainers.LeftItem;
+                    lstVewContainers.TopItem = _scrollBarContainers.Position;
+                    if (lstVewContainers.TopItem != _scrollBarContainers.Position)
+                    {
+                        _scrollBar.Position = lstVewContainers.TopItem;
+                    }
+                    lstVewContainers.SetNeedsDisplay();
+                };
+
+            _scrollBarContainers.OtherScrollBarView.ChangedPosition += () =>
+            {
+                lstVewContainers.LeftItem = _scrollBarContainers.OtherScrollBarView.Position;
+                if (lstVewContainers.LeftItem != _scrollBarContainers.OtherScrollBarView.Position)
+                {
+                    _scrollBarContainers.OtherScrollBarView.Position = lstVewContainers.LeftItem;
                 }
                 lstVewContainers.SetNeedsDisplay();
             };
 
             lstVewContainers.DrawContent += (e) =>
             {
-                _scrollBar.Size = lstVewContainers.Source.Count - 1;
-                _scrollBar.Position = lstVewContainers.TopItem;
-                _scrollBar.OtherScrollBarView.Size = lstVewContainers.Maxlength - 1;
-                _scrollBar.OtherScrollBarView.Position = lstVewContainers.LeftItem;
-                _scrollBar.Refresh();
+                _scrollBarContainers.Size = lstVewContainers.Source.Count - 1;
+                _scrollBarContainers.Position = lstVewContainers.TopItem;
+                _scrollBarContainers.OtherScrollBarView.Size = lstVewContainers.Maxlength - 1;
+                _scrollBarContainers.OtherScrollBarView.Position = lstVewContainers.LeftItem;
+                _scrollBarContainers.Refresh();
             };
 
-            lstVewContainers.SetSource((BuildWorkerNodesTableAsync().Result).OrderBy(t => t).ToList());
+
+            lstVewWorkerNodes.SelectedItemChanged += LstVewWorkerNodes_SelectedItemChanged;
+            lstVewContainers.OpenSelectedItem += OpenCountainer;
+
+
+
+            win.Add(header);
+            win.Add(workernodes);
+            win.Add(containers);
         }
 
-        private static async Task<List<string>> BuildWorkerNodesTableAsync()
+        private static void OpenCountainer(ListViewItemEventArgs obj)
         {
-            var workernodes = new List<string>();
+            var container = app.Containers.Where(p => obj.Value.ToString().StartsWith(p.Id)).FirstOrDefault();
 
-            foreach (var item in app.Containers)
+            var buttons = new List<Button>();
+
+            var button = new Button("Close", is_default: true);
+            button.Clicked += () =>
             {
-                if (!workernodes.Any(p => p.Equals(item.WorkerNode)))
-                { 
-                    workernodes.Add(item.WorkerNode);
-                }
+                Application.RequestStop();
+            };
+            buttons.Add(button);
+
+            var dialog = new Dialog($"Container :{container.Id}", 0, 0, buttons.ToArray());
+
+
+            var header = new Window("Container Header")
+            {
+                X = Pos.Center(),
+                Y = 0,
+                Width = Dim.Percent(75),
+                Height = Dim.Sized(6)
+            };
+
+
+            var startLable = new Label("Start:")
+            {
+                X = 0,
+                Y = 0,
+            };
+
+            header.Add(startLable);
+            var startValue = new Label()
+            {
+                X = Pos.Right(startLable) + 1,
+                Y = Pos.Y(startLable),
+                Width = Dim.Sized(container.Start.ToString().Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Start.ToString()
+            };
+            header.Add(startValue);
+
+            var finishLable = new Label("Finish:")
+            {
+                X = Pos.Right(startValue) + 1,
+                Y = Pos.Y(startLable),
+            };
+
+            header.Add(finishLable);
+            var finsihValue = new Label()
+            {
+                X = Pos.Right(startLable) + 1,
+                Y = Pos.Y(startLable),
+                Width = Dim.Sized(container.Finish.ToString().Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Finish.ToString()
+            };
+            header.Add(startValue);
+
+            dialog.Add(header);
+
+            Application.Run(dialog);
+        }
+
+        private static void LstVewWorkerNodes_SelectedItemChanged(ListViewItemEventArgs obj)
+        {
+            string applicatgionMasterId = "NA";
+
+            if (app.ApplicationMaster is not null)
+            {
+                applicatgionMasterId = app.ApplicationMaster.Id;
             }
+            lstVewContainers.SetSource(app.Containers.Where(p => p.WorkerNode.Equals(obj.Value.ToString()) || obj.Value.Equals("ALL")).Select(p =>
+            {
+                var postfix = "";
+                if (p.Id.Equals(applicatgionMasterId))
+                    postfix = "*";
 
-            return workernodes;
-
+                return $"{p.Id}{postfix}";
+            }).OrderBy(p => p).ToList());
         }
 
         static void Quit()
@@ -253,6 +343,9 @@ namespace YarnNinja.App.Console
         {
 
             var open = new OpenDialog("Open", "Open a file") { AllowsMultipleSelection = true };
+
+
+
 
             Application.Run(open);
 
@@ -267,33 +360,43 @@ namespace YarnNinja.App.Console
                         return;
                     }
 
-                    OpenAsync(File.ReadAllText(path), new FileInfo(path), Path.GetFileName(path));
+                    OpenAsync(File.ReadAllText(path));
                 }
             }
 
         }
 
-        static async Task OpenAsync(string initialText, FileInfo fileInfo, string tabName)
+        static async Task OpenAsync(string initialText)
         {
-            yarnLogText = initialText;
+            app = new YarnApplication(initialText);
+
             await RefreshYarnAppInfo();
         }
 
 
-        public static async Task<DataTable> BuildHeaderAsync(int cols, int rows)
+        public static async Task<DataTable> BuildHeaderAsync()
         {
             var dt = new DataTable();
             dt.Columns.Add("Application ID");
             dt.Columns.Add("Application Type");
+            dt.Columns.Add("Start");
+            dt.Columns.Add("Finish");
+            dt.Columns.Add("Duration");
             dt.Columns.Add("Number of Containers");
+            dt.Columns.Add("Status");
+            dt.Columns.Add("DAG Stats");
 
 
             var newRow = dt.NewRow();
-            app = await YarnLogParser.Parse(yarnLogText);
 
             newRow[0] = app.Header.Id;
             newRow[1] = app.Header.Type;
-            newRow[2] = app.Containers.Count;
+            newRow[2] = app.Header.Start;
+            newRow[3] = app.Header.Finish;
+            newRow[4] = app.Header.Duration.ToString(@"hh\:mm\:ss");
+            newRow[5] = app.Containers.Count;
+            newRow[6] = app.Header.Status.ToString();
+            newRow[7] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
 
             dt.Rows.Add(newRow);
 

@@ -7,7 +7,7 @@
     },
     "Debug With AppPath": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1633098813071_0260.log\""
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\Small_application_1635410258441_0004.log\""
     },
     "Debug without AppPath": {
       "commandName": "Project"
