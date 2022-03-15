@@ -27,5 +27,7 @@ namespace YarnNinja.Common
         public int SuccessfullDags { get; internal set; }
         public int FailedDags { get; internal set; }
         public int KilledDags { get; internal set; }
+        public object User { get; set; }
+        public string QueueName { get; internal set; }
     }
 }

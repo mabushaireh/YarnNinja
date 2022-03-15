@@ -5,16 +5,16 @@
       "environmentVariables": {},
       "distributionName": ""
     },
-    "Debug With AppPath": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\Small_application_1635410258441_0004.log\""
-    },
     "Debug without AppPath": {
       "commandName": "Project"
     },
     "Debug with Wrong Path": {
       "commandName": "Project",
       "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\wrong path.log\""
+    },
+    "Debug With Tez-Success": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647265892795_0006.log\""
     }
   }
 }

@@ -86,30 +86,12 @@ namespace YarnNinja.App.Console
 
         static async Task RefreshYarnAppInfo()
         {
-            var header = new FrameView("Yarn Application Info")
-            {
-                X = Pos.Center(),
-                Y = 0,
-                Width = Dim.Percent(100),
-                Height = Dim.Sized(6)
-            };
-
-
-            var tableView = new TableView()
-            {
-                Table = await BuildHeaderAsync(),
-                Width = Dim.Fill(),
-                Height = Dim.Sized(6),
-            };
-            tableView.Style.ExpandLastColumn = true;
-
-
-            header.Add(tableView);
+            var header = await BuildHeaderAsync();
 
             var workernodes = new Window("Workers")
             {
                 X = 0,
-                Y = 6,
+                Y = 10,
 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
@@ -269,8 +251,8 @@ namespace YarnNinja.App.Console
             {
                 X = Pos.Center(),
                 Y = 0,
-                Width = Dim.Percent(75),
-                Height = Dim.Sized(6)
+                Width = Dim.Percent(100),
+                Height = Dim.Sized(3)
             };
 
 
@@ -281,6 +263,7 @@ namespace YarnNinja.App.Console
             };
 
             header.Add(startLable);
+
             var startValue = new Label()
             {
                 X = Pos.Right(startLable) + 1,
@@ -301,14 +284,33 @@ namespace YarnNinja.App.Console
             header.Add(finishLable);
             var finsihValue = new Label()
             {
-                X = Pos.Right(startLable) + 1,
-                Y = Pos.Y(startLable),
+                X = Pos.Right(finishLable) + 1,
+                Y = Pos.Y(finishLable),
                 Width = Dim.Sized(container.Finish.ToString().Length),
                 Height = 1,
                 ColorScheme = Colors.TopLevel,
                 Text = container.Finish.ToString()
             };
-            header.Add(startValue);
+            header.Add(finsihValue);
+
+            var durationLable = new Label("Duration:")
+            {
+                X = Pos.Right(finsihValue) + 1,
+                Y = Pos.Y(startLable),
+            };
+
+            header.Add(durationLable);
+            var durationValue = new Label()
+            {
+                X = Pos.Right(durationLable) + 1,
+                Y = Pos.Y(durationLable),
+                Width = Dim.Sized(container.Duration.ToString(@"hh\:mm\:ss").Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Duration.ToString(@"hh\:mm\:ss")
+            };
+            header.Add(durationValue);
+
 
             dialog.Add(header);
 
@@ -374,8 +376,17 @@ namespace YarnNinja.App.Console
         }
 
 
-        public static async Task<DataTable> BuildHeaderAsync()
+        public static async Task<FrameView> BuildHeaderAsync()
         {
+            var header = new FrameView("Yarn Application Info")
+            {
+                X = Pos.Center(),
+                Y = 0,
+                Width = Dim.Percent(100),
+                Height = Dim.Sized(10)
+            };
+
+            //Headder
             var dt = new DataTable();
             dt.Columns.Add("Application ID");
             dt.Columns.Add("Application Type");
@@ -384,11 +395,8 @@ namespace YarnNinja.App.Console
             dt.Columns.Add("Duration");
             dt.Columns.Add("Number of Containers");
             dt.Columns.Add("Status");
-            dt.Columns.Add("DAG Stats");
-
 
             var newRow = dt.NewRow();
-
             newRow[0] = app.Header.Id;
             newRow[1] = app.Header.Type;
             newRow[2] = app.Header.Start;
@@ -396,11 +404,43 @@ namespace YarnNinja.App.Console
             newRow[4] = app.Header.Duration.ToString(@"hh\:mm\:ss");
             newRow[5] = app.Containers.Count;
             newRow[6] = app.Header.Status.ToString();
-            newRow[7] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
+            dt.Rows.Add(newRow);
+
+            var table1 = new TableView()
+            {
+                Table = dt,
+                Width = Dim.Fill(),
+                Height = Dim.Sized(4),
+            };
+            table1.Style.ExpandLastColumn = true;
+            header.Add(table1);
+
+
+            dt = new DataTable();
+            dt.Columns.Add("DAG");
+            dt.Columns.Add("User");
+            dt.Columns.Add("Queue");
+
+
+            newRow = dt.NewRow();
+            newRow[0] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
+            newRow[1] = app.Header.User;
+            newRow[2] = app.Header.QueueName;
 
             dt.Rows.Add(newRow);
 
-            return dt;
+            var table2 = new TableView()
+            {
+                Table = dt,
+                X = Pos.X(table1),
+                Y = Pos.Bottom(table1),
+                Width = Dim.Fill(),
+                Height = Dim.Sized(4),
+            };
+            table2.Style.ExpandLastColumn = true;
+            header.Add(table2);
+
+            return header;
         }
     }
 }

@@ -32,6 +32,9 @@ namespace YarnNinja.Common
         //const string workerNodePattern = "Container: (.*) on (.*)_30050";
         //const string appExitStatusPattern = "[AMShutdownThread] |rm.YarnTaskSchedulerService|: Unregistering application from RM, exitStatus=.*,";
         const string applicationExsitStausPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
+        const string userPattern = "export USER=\"(.*?)\"";
+        const string queueNamePattern = ".*queueName=(.*)";
+        
 
         public string YarnLog { get; }
         public YarnApplicationHeader Header { get; set; }
@@ -128,24 +131,55 @@ namespace YarnNinja.Common
 
         private async Task ParesApplicationMasterAsync(YarnApplicationContainer appMaster)
         {
-            //TODO: get app Start Time ==> first date one the syslog ??? couldnt find a better way
-            // Get Syslog logs
-            List<YarnApplicationContainerLog> syslog = appMaster.Logs.Where(p => p.YarnLogType == LogType.syslog).ToList();
-
-            // Now merage all Loglines
-            var allLogs = new List<YarnApplicationLogLine>();
-            foreach (var log in syslog)
-            {
-                allLogs.AddRange(log.LogLines);
-            }
-
-            this.Header.Start = allLogs.Min(p => p.Timestamp);
-            this.Header.Finish = allLogs.Max(p => p.Timestamp);
+            this.Header.Start = appMaster.Start;
+            this.Header.Finish = appMaster.Finish;
 
             // Get application status
-            var shutdownLogs = allLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
+            var allSysLogs = appMaster.GetLogsByType(LogType.syslog);
 
-            Regex r = new Regex(applicationExsitStausPattern, RegexOptions.Singleline);
+            var shutdownLogs = allSysLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
+
+            //Get User
+            var allLunchLogs = appMaster.GetLogsByType(LogType.launch_container_sh);
+            Regex r = new Regex(userPattern, RegexOptions.Singleline);
+            var exportuserCommand = allLunchLogs.Where(P => P.Msg.StartsWith("export USER=")).FirstOrDefault();
+
+            if (exportuserCommand is not null)
+            {
+                Match m = r.Match(exportuserCommand.Msg);
+
+                while (m.Success)
+                {
+                    Group user = m.Groups[1];
+                    this.Header.User = user.Captures[0].Value.Trim();
+                    break;
+                }
+            }
+
+
+            // Get Queue Name
+            var dagSubmitted = allSysLogs.Where(p =>
+                                p.Function.StartsWith("IPC Server handler") &&
+                                p.Msg.Contains("[Event:DAG_SUBMITTED]")
+                ).FirstOrDefault();
+
+            r = new Regex(queueNamePattern, RegexOptions.Singleline);
+
+            if (dagSubmitted is not null)
+            {
+                Match m = r.Match(dagSubmitted.Msg);
+
+                while (m.Success)
+                {
+                    Group user = m.Groups[1];
+                    this.Header.QueueName = user.Captures[0].Value.Trim();
+                    break;
+                }
+            }
+
+
+
+            r = new Regex(applicationExsitStausPattern, RegexOptions.Singleline);
 
             foreach (var log in shutdownLogs)
             {
@@ -177,8 +211,8 @@ namespace YarnNinja.Common
                     this.Header.SuccessfullDags = int.Parse(successfulDagsg.Captures[0].Value.Trim());
                     this.Header.FailedDags = int.Parse(failedDagsg.Captures[0].Value.Trim());
                     this.Header.KilledDags = int.Parse(killedDagsg.Captures[0].Value.Trim());
-
-                    m = m.NextMatch();
+                    break;
+                    //m = m.NextMatch();
                 }
             }
 
