@@ -1,38 +1,19 @@
-﻿namespace YarnNinja.Common
+﻿using YarnNinja.Common.Core;
+
+namespace YarnNinja.Common
 {
     public class YarnApplicationContainer
     {
+        private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
+        public string ApplicationType { get; private set; }
 
         public string Id { get; set; }
+        
         private DateTime start = DateTime.MinValue;
-        private DateTime finish = DateTime.MaxValue;
-
-
-        public int Order
+        public DateTime Start
         {
             get
             {
-                return int.Parse(Id.Substring(Id.Length - 6, 6));
-            }
-        }
-
-        public List<YarnApplicationLogLine> GetLogsByType(LogType logType)
-        {
-                List<YarnApplicationContainerLog> logs = this.Logs.Where(p => p.YarnLogType == logType).ToList();
-            // Now merage all Loglines
-            var allLogs = new List<YarnApplicationLogLine>();
-            foreach (var log in logs)
-            {
-                allLogs.AddRange(log.LogLines);
-            }
-
-            return allLogs;
-        }
-
-        public string WorkerNode { get; set; }
-        public DateTime Start
-        {
-            get {
                 if (start == DateTime.MinValue)
                 {
                     // parse for container start time
@@ -45,9 +26,11 @@
                 return this.start;
             }
         }
-        public string Status { get; set; }
-        public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
-        public DateTime Finish { get
+
+        private DateTime finish = DateTime.MaxValue;
+        public DateTime Finish
+        {
+            get
             {
                 if (finish == DateTime.MaxValue)
                 {
@@ -59,7 +42,24 @@
                 }
 
                 return this.finish;
-            } }
+            }
+        }
+
+
+        public int Order
+        {
+            get
+            {
+                return int.Parse(Id.Substring(Id.Length - 6, 6));
+            }
+        }
+
+
+        public string WorkerNode { get; set; }
+        
+        public string Status { get; set; }
+
+        public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
 
         public TimeSpan Duration
         {
@@ -68,5 +68,28 @@
                 return Finish - Start;
             }
         }
+
+
+
+        public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = yarnApplicationType; }
+
+        private YarnApplicationContainer() { }
+
+
+
+
+        public List<YarnApplicationLogLine> GetLogsByType(LogType logType)
+        {
+            List<YarnApplicationContainerLog> logs = this.Logs.Where(p => p.YarnLogType == logType).ToList();
+            // Now merage all Loglines
+            var allLogs = new List<YarnApplicationLogLine>();
+            foreach (var log in logs)
+            {
+                allLogs.AddRange(log.LogLines);
+            }
+
+            return allLogs;
+        }
+
     }
 }

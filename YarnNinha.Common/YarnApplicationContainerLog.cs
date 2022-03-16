@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
+using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -21,8 +17,9 @@ namespace YarnNinja.Common
     }
     public class YarnApplicationContainerLog
     {
-        internal const string yarnLogLinePattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(\\w*)\\] \\[(.*)\\] \\|(.*)\\|: (.*)";
-        
+        internal const string yarnLogLineTezPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(\\w*)\\] \\[(.*)\\] \\|(.*)\\|: (.*)";
+        internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(\\w)*\\] (.*): (.*)";
+
         private List<YarnApplicationLogLine> logLines = null;
         public LogType YarnLogType { get; set; }
         public string LogText { get; set; }
@@ -31,7 +28,7 @@ namespace YarnNinja.Common
         {
             get
             {
-                if (logLines is null)
+                if (logLines is null || logLines.Count ==0)
                 {
                     logLines = new List<YarnApplicationLogLine>();
                     ParseLogsAsync().Wait();
@@ -41,9 +38,18 @@ namespace YarnNinja.Common
             }
         }
 
+        private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
+
+        public Core.YarnApplicationType YarnApplicationType
+        {
+            get { return this.yarnApplicationType; }
+            private set { }
+        }
+
+
         private async Task ParseLogsAsync()
         {
-            if (this.YarnLogType == LogType.launch_container_sh)
+            if (this.YarnLogType == LogType.launch_container_sh || this.YarnLogType == LogType.directory_info)
             {
                 var result = LogText.Split(new[] { '\r', '\n' });
                 foreach (var line in result)
@@ -56,7 +62,13 @@ namespace YarnNinja.Common
             }
             else
             {
-                Regex r = new Regex(yarnLogLinePattern, RegexOptions.None);
+                Regex r = null;
+                if (this.YarnApplicationType == Core.YarnApplicationType.Tez)
+                    r = new Regex(yarnLogLineTezPattern, RegexOptions.None);
+                else if (this.YarnApplicationType == Core.YarnApplicationType.MapReduce)
+                    r = new Regex(yarnLogLineMapredPattern, RegexOptions.None);
+                else
+                    throw new Exception("Spark Logs is not implemeneted yet!");
 
                 Match m = r.Match(LogText);
                 while (m.Success)
@@ -70,7 +82,7 @@ namespace YarnNinja.Common
 
                     var logLine = new YarnApplicationLogLine
                     {
-                        Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd hh:mm:ss,fff", null),
+                        Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss,fff", null),
                         Function = functiong.Captures[0].Value.Trim(),
                         Module = moduleg.Captures[0].Value.Trim(),
                         Msg = msgg.Captures[0].Value.Trim()
@@ -103,11 +115,13 @@ namespace YarnNinja.Common
 
         }
 
-        public YarnApplicationContainerLog(Match m)
-        {
-            this.LogText = m.Groups[3].Captures[0].Value.Trim();
+        private YarnApplicationContainerLog() { }
 
-            var logType = m.Groups[4].Captures[0].Value.Trim();
+        public YarnApplicationContainerLog(YarnApplicationType applicationType, string logText, string logType)
+        {
+
+            this.LogText = logText;
+            this.yarnApplicationType = applicationType;
 
             switch (logType)
             {
@@ -140,8 +154,6 @@ namespace YarnNinja.Common
                     else if (logType.StartsWith("syslog_dag")) YarnLogType = LogType.syslog;
                     break;
             }
-
-
         }
     }
 }

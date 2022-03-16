@@ -27,10 +27,7 @@ namespace YarnNinja.Common
     public class YarnApplication
     {
         internal const string applicationIdPattern = "application_\\d+_\\d{4,}";
-        //const string containerIdPattern = "Container: (container_[^\\s]*)";
         internal const string containerLogPattern = "Container: (.*?) on (.*?)_30050_(.*?)End of LogType:(.*?)[\\*]+";
-        //const string workerNodePattern = "Container: (.*) on (.*)_30050";
-        //const string appExitStatusPattern = "[AMShutdownThread] |rm.YarnTaskSchedulerService|: Unregistering application from RM, exitStatus=.*,";
         const string applicationExsitStausPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
         const string userPattern = "export USER=\"(.*?)\"";
         const string queueNamePattern = ".*queueName=(.*)";
@@ -81,7 +78,7 @@ namespace YarnNinja.Common
 
         public YarnApplication(string yarnLog)
         {
-            YarnLog = yarnLog;
+            this.YarnLog = yarnLog;
 
             Header = new YarnApplicationHeader();
 
@@ -90,16 +87,26 @@ namespace YarnNinja.Common
                 Header.Id = Regex.Match(this.YarnLog, applicationIdPattern).Value;
             }
 
-            GetContainersAsync(this.YarnLog);
+            var isTez = yarnLog.Contains("./tezlib");
+            var isMapred = false;
+            if (!isTez)
+                isMapred = yarnLog.Contains("./mr-framework");
+
+            Header.Type = (isTez ? Core.YarnApplicationType.Tez : (isMapred ? Core.YarnApplicationType.MapReduce : Core.YarnApplicationType.Spark));
+
+
+            ParseContainersAsync().Wait();
         }
 
 
-        private async Task GetContainersAsync(string yarnLogText)
+        private async Task ParseContainersAsync()
         {
             this.Containers = new List<YarnApplicationContainer>();
             Regex r = new Regex(containerLogPattern, RegexOptions.Singleline);
 
-            Match m = r.Match(yarnLogText);
+
+
+            Match m = r.Match(this.YarnLog);
             while (m.Success)
             {
                 Group containerId = m.Groups[1];
@@ -115,32 +122,40 @@ namespace YarnNinja.Common
 
                 if (container is null)
                 {
-                    container = new YarnApplicationContainer { Id = id, WorkerNode = workernodec[0].Value.Trim() };
+                    container = new YarnApplicationContainer (this.Header.Type) { Id = id, WorkerNode = workernodec[0].Value.Trim() };
+
                     this.Containers.Add(container);
                 }
 
-                container.Logs.Add(new YarnApplicationContainerLog(m));
+                var LogText = m.Groups[3].Captures[0].Value.Trim();
+
+                var logType = m.Groups[4].Captures[0].Value.Trim();
+
+                container.Logs.Add(new YarnApplicationContainerLog(this.Header.Type, LogText, logType));
 
 
                 m = m.NextMatch();
             }
 
             if (this.ApplicationMaster is not null)
-                await ParesApplicationMasterAsync(this.ApplicationMaster);
+                await ParseHeaderInfoAsync();
         }
 
-        private async Task ParesApplicationMasterAsync(YarnApplicationContainer appMaster)
+        private async Task ParseHeaderInfoAsync()
         {
-            this.Header.Start = appMaster.Start;
-            this.Header.Finish = appMaster.Finish;
+            // Get Application Type:
+            var allDirectoryInfoLogs = this.ApplicationMaster.GetLogsByType(LogType.directory_info);
 
-            // Get application status
-            var allSysLogs = appMaster.GetLogsByType(LogType.syslog);
 
-            var shutdownLogs = allSysLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
+            // Set start and finish for the application as the app Master Start and Finish
+            this.Header.Start = this.ApplicationMaster.Start;
+            this.Header.Finish = this.ApplicationMaster.Finish;
 
+
+            
+            
             //Get User
-            var allLunchLogs = appMaster.GetLogsByType(LogType.launch_container_sh);
+            var allLunchLogs = this.ApplicationMaster.GetLogsByType(LogType.launch_container_sh);
             Regex r = new Regex(userPattern, RegexOptions.Singleline);
             var exportuserCommand = allLunchLogs.Where(P => P.Msg.StartsWith("export USER=")).FirstOrDefault();
 
@@ -155,6 +170,10 @@ namespace YarnNinja.Common
                     break;
                 }
             }
+
+            // Get application status
+            var allSysLogs = this.ApplicationMaster.GetLogsByType(LogType.syslog);
+           
 
 
             // Get Queue Name
@@ -177,7 +196,9 @@ namespace YarnNinja.Common
                 }
             }
 
+            r = new Regex(userPattern, RegexOptions.Singleline);
 
+            var shutdownLogs = allSysLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
 
             r = new Regex(applicationExsitStausPattern, RegexOptions.Singleline);
 
@@ -212,7 +233,6 @@ namespace YarnNinja.Common
                     this.Header.FailedDags = int.Parse(failedDagsg.Captures[0].Value.Trim());
                     this.Header.KilledDags = int.Parse(killedDagsg.Captures[0].Value.Trim());
                     break;
-                    //m = m.NextMatch();
                 }
             }
 
