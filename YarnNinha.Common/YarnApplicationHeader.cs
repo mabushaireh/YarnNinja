@@ -27,6 +27,14 @@ namespace YarnNinja.Common
         public int SuccessfullDags { get; internal set; }
         public int FailedDags { get; internal set; }
         public int KilledDags { get; internal set; }
+        public int CompletedMappers { get; internal set; }
+        public int SuccessfullMappers { get; internal set; }
+        public int FailedMappers { get; internal set; }
+        public int KilledMappers { get; internal set; }
+        public int CompletedReducers { get; internal set; }
+        public int SuccessfullReducers { get; internal set; }
+        public int FailedReducers { get; internal set; }
+        public int KilledReducers { get; internal set; }
         public object User { get; set; }
         public string QueueName { get; internal set; }
     }

@@ -43,17 +43,18 @@ namespace YarnNinja.App.Console
 
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem[] {
-            new MenuBarItem ("_File", new MenuItem [] {
-                new MenuItem ("_Open", "Yarn App Log", () => Open()),
-                new MenuItem ("_Close", "",null),
-                new MenuItem ("_Quit", "", () => Quit ())
-            }),
-            new MenuBarItem ("_Help", new MenuItem [] {
-                new MenuItem ("_Documentation", "", null),
-                new MenuItem ("_Contribute", "", null),
-                new MenuItem ("_About", "", null)
-            })
-        });
+                new MenuBarItem ("_File", new MenuItem [] {
+                    new MenuItem ("_Open", "Yarn App Log", () => btnOpen()),
+                    new MenuItem ("_Close", "",null),
+                    new MenuItem ("_Quit", "", () => btnQuit ())
+                }),
+                new MenuBarItem ("_Help", new MenuItem [] {
+                    new MenuItem ("_Documentation", "", null),
+                    new MenuItem ("_Contribute", "", null),
+                    new MenuItem ("_About", "", null)
+                })
+            });
+
             top.Add(menu);
 
 
@@ -78,13 +79,10 @@ namespace YarnNinja.App.Console
                 OpenAsync(File.ReadAllText(path));
             }
 
-
             Application.Run();
-
-
         }
 
-        static async Task RefreshYarnAppInfo()
+        private static async Task RefreshYarnAppInfo()
         {
             var header = await BuildHeaderAsync();
 
@@ -97,7 +95,6 @@ namespace YarnNinja.App.Console
                 Width = Dim.Fill(),
                 Height = Dim.Sized(10)
             };
-
 
 
             var lstVewWorkerNodes = new ListView()
@@ -335,13 +332,13 @@ namespace YarnNinja.App.Console
             }).OrderBy(p => p).ToList());
         }
 
-        static void Quit()
+        private static void btnQuit()
         {
             var n = MessageBox.Query(50, 7, "Quit Demo", "Are you sure you want to quit this YarnNinja?", "Yes", "No");
             if (n == 0) Application.RequestStop();
         }
 
-        static void Open()
+        private static void btnOpen()
         {
 
             var open = new OpenDialog("Open", "Open a file") { AllowsMultipleSelection = true };
@@ -368,7 +365,7 @@ namespace YarnNinja.App.Console
 
         }
 
-        static async Task OpenAsync(string initialText)
+        private static async Task OpenAsync(string initialText)
         {
             app = new YarnApplication(initialText);
 
@@ -376,7 +373,7 @@ namespace YarnNinja.App.Console
         }
 
 
-        public static async Task<FrameView> BuildHeaderAsync()
+        private static async Task<FrameView> BuildHeaderAsync()
         {
             var header = new FrameView("Yarn Application Info")
             {
@@ -417,13 +414,28 @@ namespace YarnNinja.App.Console
 
 
             dt = new DataTable();
-            dt.Columns.Add("DAG");
+            if (app.Header.Type == YarnApplicationType.Tez)
+            {
+                dt.Columns.Add("DAG");
+            }
+            else if (app.Header.Type == YarnApplicationType.MapReduce)
+            {
+                dt.Columns.Add("Mappers/Reducers");
+            }
             dt.Columns.Add("User");
             dt.Columns.Add("Queue");
 
 
             newRow = dt.NewRow();
-            newRow[0] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
+            if (app.Header.Type == YarnApplicationType.Tez)
+            {
+                newRow[0] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
+            }
+            else if (app.Header.Type == YarnApplicationType.MapReduce)
+            {
+                newRow[0] = $"Completed Mappers: {app.Header.CompletedMappers}, Completed Reducers: {app.Header.CompletedReducers}";
+            }
+            
             newRow[1] = app.Header.User;
             newRow[2] = app.Header.QueueName;
 

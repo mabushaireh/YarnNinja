@@ -18,7 +18,7 @@ namespace YarnNinja.Common
     public class YarnApplicationContainerLog
     {
         internal const string yarnLogLineTezPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(\\w*)\\] \\[(.*)\\] \\|(.*)\\|: (.*)";
-        internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(\\w)*\\] (.*): (.*)";
+        internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
 
         private List<YarnApplicationLogLine> logLines = null;
         public LogType YarnLogType { get; set; }

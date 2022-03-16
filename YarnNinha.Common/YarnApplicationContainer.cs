@@ -4,11 +4,60 @@ namespace YarnNinja.Common
 {
     public class YarnApplicationContainer
     {
+        private int countMappers = -1;
+        private int countReducers = -1;
+
+        
+        public int CountMappers
+        {
+            get 
+            {
+                if (yarnApplicationType != YarnApplicationType.MapReduce) {
+                    return -1;
+                }
+                if (countMappers < 0)
+                {
+                    // get all syslog lines
+                    var allSyslogLine = GetLogsByType(LogType.syslog);
+
+                    var filterTasks = allSyslogLine.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function.Equals("main") && p.Equals("org.apache.hadoop.metrics2.impl.MetricsSystemImpl") && p.Msg.EndsWith("metrics system started")).ToList();
+                    countMappers = filterTasks.Where(p => p.Msg.StartsWith("MapTask")).Count();
+                    countReducers = filterTasks.Where(p => p.Msg.StartsWith("ReduceTask")).Count();
+                }
+                return countMappers;
+            }
+            private set { }
+        }
+
+        public int CountReducers
+        {
+            get
+            {
+                if (yarnApplicationType != YarnApplicationType.MapReduce)
+                {
+                    return -1;
+                }
+                if (countReducers < 0)
+                {
+                    // get all syslog lines
+                    var allSyslogLine = GetLogsByType(LogType.syslog);
+
+                    var filterTasks = allSyslogLine.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function.Equals("main") && p.Equals("org.apache.hadoop.metrics2.impl.MetricsSystemImpl") && p.Msg.EndsWith("metrics system started")).ToList();
+                    countMappers = filterTasks.Where(p => p.Msg.StartsWith("MapTask")).Count();
+                    countReducers = filterTasks.Where(p => p.Msg.StartsWith("ReduceTask")).Count();
+                }
+                return countReducers;
+            }
+            private set { }
+        }
+
+
+
         private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
         public string ApplicationType { get; private set; }
 
         public string Id { get; set; }
-        
+
         private DateTime start = DateTime.MinValue;
         public DateTime Start
         {
@@ -56,7 +105,7 @@ namespace YarnNinja.Common
 
 
         public string WorkerNode { get; set; }
-        
+
         public string Status { get; set; }
 
         public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
