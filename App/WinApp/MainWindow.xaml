@@ -1,0 +1,138 @@
+﻿<Window
+    x:Class="YarnNinja.App.WinApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Page>
+        <Page.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+            <Style x:Key="TableHeader" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+            <Style x:Key="TableContent" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+            <Style x:Key="Table" TargetType="Border">
+                <Setter Property="BorderBrush"  Value="Green" />
+                <Setter Property="BorderThickness"  Value="1" />
+                <Setter Property="Padding"  Value="4" />
+            </Style>
+        </Page.Resources>
+        <Grid Width="Auto" Height="Auto" BorderThickness="1" BorderBrush="Red">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <MenuBar Grid.Column="0" Grid.Row="0" Width="Auto" HorizontalAlignment="Stretch">
+                <MenuBarItem Title="File">
+                    <MenuFlyoutItem Text="Open..." Click="MenuFlyoutItem_Click" Tag="open"/>
+                    <MenuFlyoutItem Text="Close" Click="MenuFlyoutItem_Click" Tag="close"/>
+                    <MenuFlyoutItem Text="Exit" Click="MenuFlyoutItem_Click" Tag="exit"/>
+                </MenuBarItem>
+                <MenuBarItem Title="Help">
+                    <MenuFlyoutItem Text="About"/>
+                </MenuBarItem>
+            </MenuBar>
+            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" Padding="10"  Background="WhiteSmoke"  BorderThickness="1" BorderBrush="Green">
+                <TextBlock FontSize="20">Yarn Application Info</TextBlock>
+                <Grid Width="Auto" Height="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!-- Table Header -->
+                    <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Application ID</TextBlock>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Applicatoin Type</TextBlock>
+                    </Border>
+                    <Border Grid.Column="2" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Start</TextBlock>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Finsih</TextBlock>
+                    </Border>
+                    <Border Grid.Column="4" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Duration</TextBlock>
+                    </Border>
+                    <Border Grid.Column="5" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Number of containers</TextBlock>
+                    </Border>
+                    <Border Grid.Column="6" Grid.Row="0" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Staus</TextBlock>
+                    </Border>
+                    <!-- Table Values -->
+                    <Border Grid.Column="0" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbApplicationId"  Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbApplicationType" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="2" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbStart" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbFinish" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="4" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbDuration" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="5" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbNumOfContainers" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <Border Grid.Column="6" Grid.Row="1" Style="{StaticResource Table}">
+                        <TextBlock Name="tbStatus" Style="{StaticResource TableContent}"/>
+                    </Border>
+                    <!-- Table Header -->
+                    <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">DAGs</TextBlock>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">User</TextBlock>
+                    </Border>
+                    <Border Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Table}">
+                        <TextBlock Style="{StaticResource TableHeader}">Queue</TextBlock>
+                    </Border>
+                    <!-- Table Values -->
+                    <Border Grid.Row="3" Grid.ColumnSpan="3" Style="{StaticResource Table}">
+                        <TextBlock Name="tbDAGs_Tasks" Style="{StaticResource TableContent}"></TextBlock>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Table}">
+                        <TextBlock Name="tbUser" Style="{StaticResource TableContent}"></TextBlock>
+                    </Border>
+                    <Border Grid.Column="5" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Table}">
+                        <TextBlock Name="tbQueue" Style="{StaticResource TableContent}"></TextBlock>
+                    </Border>
+                </Grid>
+            </StackPanel>
+
+        </Grid>
+    </Page>
+    
+    
+</Window>

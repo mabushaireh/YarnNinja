@@ -35,7 +35,7 @@ namespace YarnNinja.Common
         public int SuccessfullReducers { get; internal set; }
         public int FailedReducers { get; internal set; }
         public int KilledReducers { get; internal set; }
-        public object User { get; set; }
+        public string User { get; set; }
         public string QueueName { get; internal set; }
     }
 }

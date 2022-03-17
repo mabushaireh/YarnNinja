@@ -42,10 +42,17 @@ namespace YarnNinja.App.WinApp
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
-            m_window.Activate();
+            Window = new MainWindow();
+            Window.Activate();
+            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(Window);
+
         }
 
-        private Window m_window;
+
+
+        public static MainWindow Window { get; private set; }
+        public static IntPtr WindowHandle { get; private set; }
+
     }
+
 }
