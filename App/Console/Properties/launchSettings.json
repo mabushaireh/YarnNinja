@@ -19,6 +19,10 @@
     "Debug with mapred-Success": {
       "commandName": "Project",
       "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647350095798_0001.log\""
+    },
+    "Debug with Spark-Fail": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647400556153_0012.txt\""
     }
   }
 }

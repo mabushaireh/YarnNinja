@@ -14,6 +14,7 @@ namespace YarnNinja.Common
         syslog,
         prelaunch_out,
         DAG,
+        Unknown,
     }
     public class YarnApplicationContainerLog
     {
@@ -21,14 +22,47 @@ namespace YarnNinja.Common
         internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
 
         private List<YarnApplicationLogLine> logLines = null;
-        public LogType YarnLogType { get; set; }
+        public string YarnLogType { get; set; }
+        public LogType BaseLogType
+        {
+            get
+            {
+                switch (YarnLogType)
+                {
+                    case "container-localizer-syslog":
+                        return LogType.container_localizer_syslog;
+                    case "directory.info":
+                        return LogType.directory_info;
+                    case "launch_container.sh":
+                        return LogType.launch_container_sh;
+                    case "prelaunch.err":
+                        return LogType.prelaunch_err;
+                    case "prelaunch.out":
+                        return LogType.prelaunch_out;
+                    case "stderr":
+                        return LogType.stderr;
+                    case "stdout":
+                        return LogType.stdout;
+                    case "syslog":
+                        return LogType.syslog;
+                    default:
+                        if (YarnLogType.StartsWith("dag_"))
+                            return LogType.DAG;
+                        else if (YarnLogType.StartsWith("syslog_dag"))
+                            return LogType.syslog;
+                        else
+                            return LogType.Unknown;
+                }
+            }
+            private set { }
+        }
         public string LogText { get; set; }
 
         public List<YarnApplicationLogLine> LogLines
         {
             get
             {
-                if (logLines is null || logLines.Count ==0)
+                if (logLines is null || logLines.Count == 0)
                 {
                     logLines = new List<YarnApplicationLogLine>();
                     ParseLogsAsync().Wait();
@@ -49,7 +83,7 @@ namespace YarnNinja.Common
 
         private async Task ParseLogsAsync()
         {
-            if (this.YarnLogType == LogType.launch_container_sh || this.YarnLogType == LogType.directory_info)
+            if (this.BaseLogType == LogType.launch_container_sh || this.BaseLogType == LogType.directory_info)
             {
                 var result = LogText.Split(new[] { '\r', '\n' });
                 foreach (var line in result)
@@ -122,38 +156,7 @@ namespace YarnNinja.Common
 
             this.LogText = logText;
             this.yarnApplicationType = applicationType;
-
-            switch (logType)
-            {
-                case "container-localizer-syslog":
-                    YarnLogType = LogType.container_localizer_syslog;
-                    break;
-                case "directory.info":
-                    YarnLogType = LogType.directory_info;
-                    break;
-                case "launch_container.sh":
-                    YarnLogType = LogType.launch_container_sh;
-                    break;
-                case "prelaunch.err":
-                    YarnLogType = LogType.prelaunch_err;
-                    break;
-                case "prelaunch.out":
-                    YarnLogType = LogType.prelaunch_out;
-                    break;
-                case "stderr":
-                    YarnLogType = LogType.stderr;
-                    break;
-                case "stdout":
-                    YarnLogType = LogType.stdout;
-                    break;
-                case "syslog":
-                    YarnLogType = LogType.syslog;
-                    break;
-                default:
-                    if (logType.StartsWith("dag_")) YarnLogType = LogType.DAG;
-                    else if (logType.StartsWith("syslog_dag")) YarnLogType = LogType.syslog;
-                    break;
-            }
+            YarnLogType = logType;
         }
     }
 }

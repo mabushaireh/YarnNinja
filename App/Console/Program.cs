@@ -86,7 +86,7 @@ namespace YarnNinja.App.Console
         {
             var header = await BuildHeaderAsync();
 
-            var workernodes = new Window("Workers")
+            var workernodesWin = new Window("Workers")
             {
                 X = 0,
                 Y = 10,
@@ -107,7 +107,7 @@ namespace YarnNinja.App.Console
                 AllowsMultipleSelection = false
             };
 
-            workernodes.Add(lstVewWorkerNodes);
+            workernodesWin.Add(lstVewWorkerNodes);
 
             var _scrollBar = new ScrollBarView(lstVewWorkerNodes, true);
 
@@ -145,7 +145,7 @@ namespace YarnNinja.App.Console
             lstVewWorkerNodes.SetSource(workers);
 
 
-            workernodes.Add(lstVewWorkerNodes);
+            workernodesWin.Add(lstVewWorkerNodes);
 
             var containers = new Window("Containers")
             {
@@ -224,95 +224,11 @@ namespace YarnNinja.App.Console
 
 
             win.Add(header);
-            win.Add(workernodes);
+            win.Add(workernodesWin);
             win.Add(containers);
         }
 
-        private static void OpenCountainer(ListViewItemEventArgs obj)
-        {
-            var container = app.Containers.Where(p => obj.Value.ToString().StartsWith(p.Id)).FirstOrDefault();
 
-            var buttons = new List<Button>();
-
-            var button = new Button("Close", is_default: true);
-            button.Clicked += () =>
-            {
-                Application.RequestStop();
-            };
-            buttons.Add(button);
-
-            var dialog = new Dialog($"Container :{container.Id}", 0, 0, buttons.ToArray());
-
-
-            var header = new Window("Container Header")
-            {
-                X = Pos.Center(),
-                Y = 0,
-                Width = Dim.Percent(100),
-                Height = Dim.Sized(3)
-            };
-
-
-            var startLable = new Label("Start:")
-            {
-                X = 0,
-                Y = 0,
-            };
-
-            header.Add(startLable);
-
-            var startValue = new Label()
-            {
-                X = Pos.Right(startLable) + 1,
-                Y = Pos.Y(startLable),
-                Width = Dim.Sized(container.Start.ToString().Length),
-                Height = 1,
-                ColorScheme = Colors.TopLevel,
-                Text = container.Start.ToString()
-            };
-            header.Add(startValue);
-
-            var finishLable = new Label("Finish:")
-            {
-                X = Pos.Right(startValue) + 1,
-                Y = Pos.Y(startLable),
-            };
-
-            header.Add(finishLable);
-            var finsihValue = new Label()
-            {
-                X = Pos.Right(finishLable) + 1,
-                Y = Pos.Y(finishLable),
-                Width = Dim.Sized(container.Finish.ToString().Length),
-                Height = 1,
-                ColorScheme = Colors.TopLevel,
-                Text = container.Finish.ToString()
-            };
-            header.Add(finsihValue);
-
-            var durationLable = new Label("Duration:")
-            {
-                X = Pos.Right(finsihValue) + 1,
-                Y = Pos.Y(startLable),
-            };
-
-            header.Add(durationLable);
-            var durationValue = new Label()
-            {
-                X = Pos.Right(durationLable) + 1,
-                Y = Pos.Y(durationLable),
-                Width = Dim.Sized(container.Duration.ToString(@"hh\:mm\:ss").Length),
-                Height = 1,
-                ColorScheme = Colors.TopLevel,
-                Text = container.Duration.ToString(@"hh\:mm\:ss")
-            };
-            header.Add(durationValue);
-
-
-            dialog.Add(header);
-
-            Application.Run(dialog);
-        }
 
         private static void LstVewWorkerNodes_SelectedItemChanged(ListViewItemEventArgs obj)
         {
@@ -435,7 +351,7 @@ namespace YarnNinja.App.Console
             {
                 newRow[0] = $"Completed Mappers: {app.Header.CompletedMappers}, Completed Reducers: {app.Header.CompletedReducers}";
             }
-            
+
             newRow[1] = app.Header.User;
             newRow[2] = app.Header.QueueName;
 
@@ -454,5 +370,194 @@ namespace YarnNinja.App.Console
 
             return header;
         }
+
+
+
+        #region Container Dialog
+
+        private static void OpenCountainer(ListViewItemEventArgs obj)
+        {
+            var container = app.Containers.Where(p => obj.Value.ToString().StartsWith(p.Id)).FirstOrDefault();
+
+            if (container is null)
+            {
+                Application.RequestStop();
+            }
+
+            var buttons = new List<Button>();
+
+            var button = new Button("Close", is_default: true);
+
+            button.Clicked += () =>
+            {
+                Application.RequestStop();
+            };
+
+            buttons.Add(button);
+
+            var dialog = new Dialog($"Container :{container.Id}", 0, 0, buttons.ToArray());
+
+
+            var header = new Window("Container Header")
+            {
+                X = Pos.Center(),
+                Y = 0,
+                Width = Dim.Percent(100),
+                Height = Dim.Sized(3)
+            };
+
+
+            var startLable = new Label("Start:")
+            {
+                X = 0,
+                Y = 0,
+            };
+
+            header.Add(startLable);
+
+            var startValue = new Label()
+            {
+                X = Pos.Right(startLable) + 1,
+                Y = Pos.Y(startLable),
+                Width = Dim.Sized(container.Start.ToString().Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Start.ToString()
+            };
+            header.Add(startValue);
+
+            var finishLable = new Label("Finish:")
+            {
+                X = Pos.Right(startValue) + 1,
+                Y = Pos.Y(startLable),
+            };
+
+            header.Add(finishLable);
+            var finsihValue = new Label()
+            {
+                X = Pos.Right(finishLable) + 1,
+                Y = Pos.Y(finishLable),
+                Width = Dim.Sized(container.Finish.ToString().Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Finish.ToString()
+            };
+            header.Add(finsihValue);
+
+            var durationLable = new Label("Duration:")
+            {
+                X = Pos.Right(finsihValue) + 1,
+                Y = Pos.Y(startLable),
+            };
+
+            header.Add(durationLable);
+            var durationValue = new Label()
+            {
+                X = Pos.Right(durationLable) + 1,
+                Y = Pos.Y(durationLable),
+                Width = Dim.Sized(container.Duration.ToString(@"hh\:mm\:ss").Length),
+                Height = 1,
+                ColorScheme = Colors.TopLevel,
+                Text = container.Duration.ToString(@"hh\:mm\:ss")
+            };
+            header.Add(durationValue);
+
+            dialog.Add(header);
+
+            var logTypesWin = new Window("Log Types")
+            {
+                X = 0,
+                Y = 4,
+                Width = Dim.Percent(15),
+                Height = 24
+            };
+
+            var lstLogTypes = new ListView()
+            {
+                X = 0,
+                Y = 0,
+                Height = Dim.Fill(),
+                Width = Dim.Fill(),
+                AllowsMarking = false,
+                AllowsMultipleSelection = false
+            };
+
+            logTypesWin.Add(lstLogTypes);
+
+            var _scrollBar = new ScrollBarView(lstLogTypes, true);
+
+            _scrollBar.ChangedPosition += () =>
+            {
+                lstLogTypes.TopItem = _scrollBar.Position;
+                if (lstLogTypes.TopItem != _scrollBar.Position)
+                {
+                    _scrollBar.Position = lstLogTypes.TopItem;
+                }
+                lstLogTypes.SetNeedsDisplay();
+            };
+
+            _scrollBar.OtherScrollBarView.ChangedPosition += () =>
+            {
+                lstLogTypes.LeftItem = _scrollBar.OtherScrollBarView.Position;
+                if (lstLogTypes.LeftItem != _scrollBar.OtherScrollBarView.Position)
+                {
+                    _scrollBar.OtherScrollBarView.Position = lstLogTypes.LeftItem;
+                }
+                lstLogTypes.SetNeedsDisplay();
+            };
+
+            lstLogTypes.DrawContent += (e) =>
+            {
+                _scrollBar.Size = lstLogTypes.Source.Count - 1;
+                _scrollBar.Position = lstLogTypes.TopItem;
+                _scrollBar.OtherScrollBarView.Size = lstLogTypes.Maxlength - 1;
+                _scrollBar.OtherScrollBarView.Position = lstLogTypes.LeftItem;
+                _scrollBar.Refresh();
+            };
+
+            var logtypes = container.Logs.Select(p => p.YarnLogType).Distinct().ToList();
+
+            lstLogTypes.SetSource(logtypes);
+            lstLogTypes.SelectedItemChanged += (obj) => {
+                lstLogTypes_SelectedItemChanged(container, obj.Value.ToString());
+            }  ;
+
+            var logContentWin = new Window("Log Content")
+            {
+                X = Pos.Right(logTypesWin),
+                Y = 4,
+                Width = Dim.Fill(),
+                Height = 24
+            };
+            dialog.Add(logTypesWin);
+
+            logContentTxt = new TextView()
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+
+                Height = Dim.Fill()
+            };
+
+            logContentWin.Add(logContentTxt);
+
+            dialog.Add(logContentWin);
+
+            lstLogTypes.FocusFirst();
+
+            Application.Run(dialog);
+        }
+
+        static TextView logContentTxt;
+
+        private static void lstLogTypes_SelectedItemChanged(YarnApplicationContainer container, string selectedLogType)
+        {
+
+            logContentTxt.Text = container.Logs.FirstOrDefault(p => p.YarnLogType == selectedLogType).LogText;
+        }
+
+
+        #endregion
     }
 }

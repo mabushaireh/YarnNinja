@@ -27,7 +27,7 @@ namespace YarnNinja.Common
     public class YarnApplication
     {
         internal const string applicationIdPattern = "application_\\d+_\\d{4,}";
-        internal const string containerLogPattern = "Container: (.*?) on (.*?)_30050_(.*?)End of LogType:(.*?)[\\*]+";
+        internal const string containerLogPattern = "Container: (.*?) on (.*?)(LogAggregationType.*?)End of LogType:(.*?)[\\*]+";
         const string applicationExsitStausTezPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
         const string applicationExsitStausMapredPattern = "Final Stats: PendingReds:(\\d*) ScheduledMaps:(\\d*) ScheduledReds:(\\d*) AssignedMaps:(\\d*) AssignedReds:(\\d*) CompletedMaps:(\\d*) CompletedReds:(\\d*) ContAlloc:(\\d*) ContRel:(\\d*) HostLocal:(\\d*) RackLocal:(\\d*)";
         const string userPattern = "export USER=\"(.*?)\"";
@@ -150,7 +150,7 @@ namespace YarnNinja.Common
             this.Header.Finish = this.ApplicationMaster.Finish;
 
             //Get User
-            var allLunchLogs = this.ApplicationMaster.GetLogsByType(LogType.launch_container_sh);
+            var allLunchLogs = this.ApplicationMaster.GetLogsByBaseType(LogType.launch_container_sh);
             Regex r = new Regex(userPattern, RegexOptions.Singleline);
             var exportuserCommand = allLunchLogs.Where(P => P.Msg.StartsWith("export USER=")).FirstOrDefault();
 
@@ -167,7 +167,7 @@ namespace YarnNinja.Common
             }
 
             // Get application status, Queue name and user
-            var allSysLogs = this.ApplicationMaster.GetLogsByType(LogType.syslog);
+            var allSysLogs = this.ApplicationMaster.GetLogsByBaseType(LogType.syslog);
 
 
 
