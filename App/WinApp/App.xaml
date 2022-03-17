@@ -2,7 +2,7 @@
     x:Class="YarnNinja.App.WinApp.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:YarnNinja.App.WinApp">
+    xmlns:local="using:YarnNinja.App.WinApp" RequestedTheme="Light">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

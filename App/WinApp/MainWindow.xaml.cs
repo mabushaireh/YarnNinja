@@ -58,7 +58,7 @@ namespace YarnNinja.App.WinApp
 
         private async void OpenYarnApp()
         {
-            FileOpenPicker openFileDialog = new FileOpenPicker()
+            var openFileDialog = new FileOpenPicker()
             {
                 SuggestedStartLocation = PickerLocationId.Desktop
             };
@@ -73,10 +73,12 @@ namespace YarnNinja.App.WinApp
 
             if (file != null)
             {
+                brogressBar.IsActive = true;
                 var logText = await FileIO.ReadTextAsync(file);
                 this.yarnApp = new YarnApplication(logText);
 
                 await RefreshYarnAppInfo();
+                brogressBar.IsActive = false;
             }
         }
 
@@ -99,6 +101,30 @@ namespace YarnNinja.App.WinApp
             tbUser.Text = yarnApp.Header.User;
             tbQueue.Text = yarnApp.Header.QueueName;
 
+            //fill wokers
+            var workers = yarnApp.WorkerNodes.OrderBy(t => t).ToList();
+            workers.Insert(0, "ALL");
+            listWorkers.ItemsSource = workers;
+            var containers = yarnApp.Containers.OrderBy(p => p.Order).ToList();
+            dgContainers.ItemsSource = containers;
+
+            listWorkers.SelectionChanged += (sender, e) => {
+                var item = (sender as ListView).SelectedValue;
+                if (item != null)
+                {
+                    string applicatgionMasterId = "NA";
+
+                    if (yarnApp.ApplicationMaster is not null)
+                    {
+                        applicatgionMasterId = yarnApp.ApplicationMaster.Id;
+                    }
+                    var containers = yarnApp.Containers.Where(p => p.WorkerNode.Equals(item.ToString()) || item.ToString().Equals("ALL")).OrderBy(p => p.Order).ToList();
+
+                    dgContainers.ItemsSource = containers;
+                }
+            };
+            
+            
             return Task.CompletedTask;
         }
     }

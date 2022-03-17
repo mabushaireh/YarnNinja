@@ -4,15 +4,18 @@ namespace YarnNinja.Common
 {
     public class YarnApplicationContainer
     {
-        private int countMappers = -1;
-        private int countReducers = -1;
-
         
+        
+
+        public string Id { get; set; }
+
+        private int countMappers = -1;
         public int CountMappers
         {
-            get 
+            get
             {
-                if (yarnApplicationType != YarnApplicationType.MapReduce) {
+                if (yarnApplicationType != YarnApplicationType.MapReduce)
+                {
                     return -1;
                 }
                 if (countMappers < 0)
@@ -28,7 +31,8 @@ namespace YarnNinja.Common
             }
             private set { }
         }
-
+        
+        private int countReducers = -1;
         public int CountReducers
         {
             get
@@ -51,12 +55,8 @@ namespace YarnNinja.Common
             private set { }
         }
 
-
-
         private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
         public string ApplicationType { get; private set; }
-
-        public string Id { get; set; }
 
         private DateTime start = DateTime.MinValue;
         public DateTime Start
@@ -94,21 +94,8 @@ namespace YarnNinja.Common
             }
         }
 
-
-        public int Order
-        {
-            get
-            {
-                return int.Parse(Id.Substring(Id.Length - 6, 6));
-            }
-        }
-
-
-        public string WorkerNode { get; set; }
-
         public string Status { get; set; }
 
-        public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
 
         public TimeSpan Duration
         {
@@ -119,13 +106,21 @@ namespace YarnNinja.Common
         }
 
 
+        public int Order
+        {
+            get
+            {
+                return int.Parse(Id.Substring(Id.Length - 6, 6));
+            }
+        }
+
+        public string WorkerNode { get; set; }
+
+        public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
 
         public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = yarnApplicationType; }
 
         private YarnApplicationContainer() { }
-
-
-
 
         public List<YarnApplicationLogLine> GetLogsByType(string logType)
         {
