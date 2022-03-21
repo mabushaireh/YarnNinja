@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -216,7 +217,7 @@ namespace YarnNinja.Common
 
             }
 
-            if (Header.Type == Core.YarnApplicationType.Tez)
+            if (Header.Type == YarnApplicationType.Tez)
             {
                 var shutdownLogs = allSysLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
 
@@ -256,7 +257,7 @@ namespace YarnNinja.Common
                     }
                 }
             }
-            else if(Header.Type == Core.YarnApplicationType.MapReduce)
+            else if(Header.Type == YarnApplicationType.MapReduce)
             {
                 var shutdownLogs = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO 
                 && p.Function.StartsWith("Thread") 

@@ -74,11 +74,13 @@ namespace YarnNinja.App.WinApp
             if (file != null)
             {
                 brogressBar.IsActive = true;
+                brogressBar.Visibility = Visibility.Visible;
                 var logText = await FileIO.ReadTextAsync(file);
                 this.yarnApp = new YarnApplication(logText);
 
                 await RefreshYarnAppInfo();
                 brogressBar.IsActive = false;
+                brogressBar.Visibility = Visibility.Collapsed;
             }
         }
 

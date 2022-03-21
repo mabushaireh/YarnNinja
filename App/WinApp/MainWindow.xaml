@@ -50,7 +50,7 @@
             <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" Padding="10"  Background="WhiteSmoke">
                 <TextBlock FontSize="20">Yarn Application Info</TextBlock>
                 <ProgressRing Width="50" Height="50" VerticalAlignment="Center" 
-                    HorizontalAlignment="Center" IsActive="False" Name="brogressBar">
+                    HorizontalAlignment="Center" IsActive="False" Name="brogressBar" Visibility="Collapsed">
                 </ProgressRing>
                 <Grid Width="Auto" Height="Auto">
                     <Grid.ColumnDefinitions>
@@ -142,7 +142,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <ListView Grid.Column="0" Grid.Row="0" x:Name="listWorkers" BorderThickness="1" HorizontalAlignment="Left" SelectedIndex="0"/>
+                <ListView Grid.Column="0" Grid.Row="0" x:Name="listWorkers" BorderThickness="2" HorizontalAlignment="Left" SelectedIndex="0" Header="Workers"/>
 
                 <ctWinUI:DataGrid Grid.Column="1" Grid.Row="0" x:Name="dgContainers" Height="600" Margin="12" AutoGenerateColumns="False">
                     <ctWinUI:DataGrid.Columns>
