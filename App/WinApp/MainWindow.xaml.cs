@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -15,6 +17,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using WinRT.Interop;
 using YarnNinja.Common;
 using YarnNinja.Common.Core;
 
@@ -28,10 +31,20 @@ namespace YarnNinja.App.WinApp
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private AppWindow m_AppWindow;
+
         public MainWindow()
         {
             this.InitializeComponent();
+            m_AppWindow = GetAppWindowForCurrentWindow();
+            m_AppWindow.Title = "Yarn Ninja";
+        }
 
+        private AppWindow GetAppWindowForCurrentWindow()
+        {
+            IntPtr hWnd = WindowNative.GetWindowHandle(this);
+            WindowId wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            return AppWindow.GetFromWindowId(wndId);
         }
 
         private YarnApplication yarnApp;

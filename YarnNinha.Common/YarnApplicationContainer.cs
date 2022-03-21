@@ -68,8 +68,12 @@ namespace YarnNinja.Common
                     // parse for container start time
                     var allLogs = GetLogsByBaseType(LogType.syslog);
 
-                    this.start = allLogs.Min(p => p.Timestamp);
-                    this.finish = allLogs.Max(p => p.Timestamp);
+                    if (allLogs.Count > 0)
+                    {
+                        this.start = allLogs.Min(p => p.Timestamp);
+                        this.finish = allLogs.Max(p => p.Timestamp);
+                    }
+                    
                 }
 
                 return this.start;
@@ -77,6 +81,8 @@ namespace YarnNinja.Common
         }
 
         private DateTime finish = DateTime.MaxValue;
+        internal string Status;
+
         public DateTime Finish
         {
             get
@@ -86,15 +92,19 @@ namespace YarnNinja.Common
                     // parse for container start time
                     var allLogs = GetLogsByBaseType(LogType.syslog);
 
-                    this.start = allLogs.Min(p => p.Timestamp);
-                    this.finish = allLogs.Max(p => p.Timestamp);
+                    if (allLogs.Count > 0)
+                    {
+                        this.start = allLogs.Min(p => p.Timestamp);
+                        this.finish = allLogs.Max(p => p.Timestamp);
+                    }
+                        
                 }
 
                 return this.finish;
             }
         }
 
-        public string Status { get; set; }
+        public string StatusMessage { get; set; }
 
 
         public TimeSpan Duration
@@ -117,6 +127,8 @@ namespace YarnNinja.Common
         public string WorkerNode { get; set; }
 
         public List<YarnApplicationContainerLog> Logs { get; set; } = new List<YarnApplicationContainerLog>();
+        public string StatusCode { get; internal set; }
+        public DateTime StatusTime { get; internal set; }
 
         public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = yarnApplicationType; }
 

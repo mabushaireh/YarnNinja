@@ -19,7 +19,10 @@ namespace YarnNinja.Common
     public class YarnApplicationContainerLog
     {
         internal const string yarnLogLineTezPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(\\w*)\\] \\[(.*)\\] \\|(.*)\\|: (.*)";
+        internal const string yarnLogLineTezSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\[\\w*\\] \\[.*\\] \\|.*\\|: ";
+
         internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
+        internal const string yarnLogLineMapredSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\w* \\[.*\\] .*?: ";
 
         private List<YarnApplicationLogLine> logLines = null;
         public string YarnLogType { get; set; }
@@ -97,13 +100,25 @@ namespace YarnNinja.Common
             else
             {
                 Regex r = null;
+                Regex l = null;
                 if (this.YarnApplicationType == Core.YarnApplicationType.Tez)
+                {
                     r = new Regex(yarnLogLineTezPattern, RegexOptions.None);
+                    l = new Regex(yarnLogLineTezSplitPattern, RegexOptions.None);
+                }
+
                 else if (this.YarnApplicationType == Core.YarnApplicationType.MapReduce)
+                {
                     r = new Regex(yarnLogLineMapredPattern, RegexOptions.None);
+                    l = new Regex(yarnLogLineMapredSplitPattern, RegexOptions.None);
+                }
                 else
                     throw new Exception("Spark Logs is not implemeneted yet!");
 
+                var lines = l.Split(LogText);
+                //Remove first match because we know it doent count
+                lines = lines.Where((source, index) => index != 0).ToArray();
+                var i = 0;
                 Match m = r.Match(LogText);
                 while (m.Success)
                 {
@@ -113,13 +128,15 @@ namespace YarnNinja.Common
                     Group moduleg = m.Groups[4];
                     Group msgg = m.Groups[5];
 
-
+                    if (!lines[i].StartsWith(msgg.Captures[0].Value.Trim())) {
+                        throw new Exception("Parse lines failed!");
+                    }
                     var logLine = new YarnApplicationLogLine
                     {
                         Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss,fff", null),
                         Function = functiong.Captures[0].Value.Trim(),
                         Module = moduleg.Captures[0].Value.Trim(),
-                        Msg = msgg.Captures[0].Value.Trim()
+                        Msg = lines[i++]
 
                     };
 

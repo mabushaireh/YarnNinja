@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+    
     mc:Ignorable="d">
     <Page>
         <Page.Resources>
@@ -136,20 +137,20 @@
             </StackPanel>
             <Grid Grid.Column="0" Grid.Row="3" BorderBrush="Black" BorderThickness="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.3*" />
-                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.2*" />
+                    <ColumnDefinition Width="0.8*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <ListView Grid.Column="0" Grid.Row="0" x:Name="listWorkers" BorderThickness="2" HorizontalAlignment="Left" SelectedIndex="0" Header="Workers"/>
 
-                <ctWinUI:DataGrid Grid.Column="1" Grid.Row="0" x:Name="dgContainers" Height="600" Margin="12" AutoGenerateColumns="False">
+                <ctWinUI:DataGrid Grid.Column="1" Grid.Row="0" x:Name="dgContainers" Height="Auto" Width="Auto" Margin="12" AutoGenerateColumns="False" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <ctWinUI:DataGrid.Columns>
                         <ctWinUI:DataGridTextColumn 
                                 Header="Container Name" 
                                 Binding="{Binding Id}" 
-                                FontSize="12" />
+                                FontSize="12"/>
                         <ctWinUI:DataGridTextColumn 
                                 Header="Start" 
                                 Binding="{Binding Start}" 
@@ -163,9 +164,17 @@
                                 Binding="{Binding Duration}" 
                                 FontSize="12" />
                         <ctWinUI:DataGridTextColumn 
-                                Header="Status" 
-                                Binding="{Binding Status}" 
+                                Header="Status Code" 
+                                Binding="{Binding StatusCode}" 
                                 FontSize="12" />
+                        <ctWinUI:DataGridTextColumn 
+                                Header="Status Time" 
+                                Binding="{Binding StatusTime}" 
+                                FontSize="12" />
+                        <ctWinUI:DataGridTextColumn 
+                                Header="Status Message" 
+                                Binding="{Binding StatusMessage}" 
+                                FontSize="12"/>
                     </ctWinUI:DataGrid.Columns>
                 </ctWinUI:DataGrid>
             </Grid>

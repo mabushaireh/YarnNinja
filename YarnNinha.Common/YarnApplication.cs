@@ -294,6 +294,44 @@ namespace YarnNinja.Common
                     }
                 }
             }
+
+
+            //Get containers status:
+            if (this.Header.Type == YarnApplicationType.Tez)
+            {
+                //var allDagLogs = this.ApplicationMaster.GetLogsByBaseType(LogType.DAG);
+                var conatinerStatus = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function.StartsWith("Dispatcher thread") && p.Module.Contains("container.AMContainerImpl")).ToList();
+                r = new Regex("Container (.*) exited with diagnostics set to Container (.*), exitCode=(.*)\\. (\\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3})\\])?([\\s\\S\\r\\n.]*)", RegexOptions.Multiline);
+
+                foreach (var line in conatinerStatus)
+                {
+                    var m = r.Match(line.Msg);
+
+                    if (m.Success)
+                    {
+                        Group ContainerIdg = m.Groups[1];
+                        Group statusg = m.Groups[2];
+                        Group statusCodeg = m.Groups[3];
+                        Group statusTimeg = m.Groups[5];
+                        Group StatusMessageg = m.Groups[6];
+
+                        var container = this.Containers.Where(p => p.Id.Equals(ContainerIdg.Captures[0].Value.Trim())).FirstOrDefault();
+
+                        if (container != null)
+                        {
+                            container.Status = statusg.Captures[0].Value.Trim();
+                            container.StatusCode = statusCodeg.Captures[0].Value.Trim();
+                            if (statusTimeg!=null && statusTimeg.Captures.Count >0 && !string.IsNullOrEmpty(statusTimeg.Captures[0].Value))
+                                container.StatusTime = DateTime.ParseExact(statusTimeg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss.fff", null);
+
+                            container.StatusMessage = StatusMessageg.Captures[0].Value.Trim();
+                        }
+                    }
+
+                }
+            }
+           
+            
         }
     }
 }
