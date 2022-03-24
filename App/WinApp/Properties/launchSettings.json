@@ -5,6 +5,14 @@
     },
     "WinApp (Unpackaged)": {
       "commandName": "Project"
+    },
+    "Debug with Tez-Success": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647265892795_0006.log\""
+    },
+    "Debug with mapred-Success": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647350095798_0001.log\""
     }
   }
 }

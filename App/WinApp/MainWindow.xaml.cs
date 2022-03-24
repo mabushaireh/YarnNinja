@@ -40,6 +40,8 @@ namespace YarnNinja.App.WinApp
             m_AppWindow.Title = "Yarn Ninja";
         }
 
+        
+
         private AppWindow GetAppWindowForCurrentWindow()
         {
             IntPtr hWnd = WindowNative.GetWindowHandle(this);
@@ -88,13 +90,18 @@ namespace YarnNinja.App.WinApp
             {
                 brogressBar.IsActive = true;
                 brogressBar.Visibility = Visibility.Visible;
-                var logText = await FileIO.ReadTextAsync(file);
-                this.yarnApp = new YarnApplication(logText);
-
-                await RefreshYarnAppInfo();
+                await OpenYarnAppLogFile(file);
                 brogressBar.IsActive = false;
                 brogressBar.Visibility = Visibility.Collapsed;
             }
+        }
+
+        public async Task OpenYarnAppLogFile(StorageFile file)
+        {
+            var logText = await FileIO.ReadTextAsync(file);
+            this.yarnApp = new YarnApplication(logText);
+
+            await RefreshYarnAppInfo();
         }
 
         private Task RefreshYarnAppInfo()
