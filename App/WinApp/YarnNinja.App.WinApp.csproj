@@ -12,6 +12,10 @@
     <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
  
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="ContainerPage.xaml" />
+    <None Remove="YarnAppPage.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -38,5 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\YarnNinha.Common\YarnNinja.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContainerPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="YarnAppPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

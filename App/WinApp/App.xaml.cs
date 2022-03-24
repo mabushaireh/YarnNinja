@@ -48,7 +48,7 @@ namespace YarnNinja.App.WinApp
             Window.Activate();
             WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(Window);
 
-            if (arguments.Length > 0)
+            if (arguments.Length > 1)
             {
                 var path = arguments[1];
 
@@ -58,11 +58,10 @@ namespace YarnNinja.App.WinApp
                 else
                 {
                     StorageFile file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-                    _ = Window.OpenYarnAppLogFile(file);
+                    Window.OpenYarnAppLogFile(file);
                 }
-                    
-
             }
+
         }
 
         public static MainWindow Window { get; private set; }
