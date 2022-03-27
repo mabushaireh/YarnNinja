@@ -13,7 +13,12 @@
  
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\About.png" />
+    <None Remove="Assets\Home.png" />
     <None Remove="ContainerPage.xaml" />
+    <None Remove="Shell.xaml" />
+    <None Remove="Views\AboutPage.xaml" />
+    <None Remove="Views\HomePage.xaml" />
     <None Remove="YarnAppPage.xaml" />
   </ItemGroup>
 
@@ -29,8 +34,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22572-preview" />
+    <PackageReference Include="PInvoke.User32" Version="0.7.104" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -50,6 +57,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="YarnAppPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\HomePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

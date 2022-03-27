@@ -1,21 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
+using YarnNinja.App.WinApp.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,6 +14,8 @@ namespace YarnNinja.App.WinApp
     /// </summary>
     public partial class App : Application
     {
+        private Shell shell;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -34,19 +23,21 @@ namespace YarnNinja.App.WinApp
         public App()
         {
             this.InitializeComponent();
+            
+
         }
+
+        public INavigation Navigation => shell;
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             string[] arguments = Environment.GetCommandLineArgs();
-            Window = new MainWindow();
-            Window.Activate();
-            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(Window);
+            shell = new Shell();
 
             if (arguments.Length > 1)
             {
@@ -57,14 +48,16 @@ namespace YarnNinja.App.WinApp
                 }
                 else
                 {
-                    StorageFile file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-                    Window.OpenYarnAppLogFile(file);
+                    shell.OpenYarnAppFile(path);
                 }
             }
 
+            shell.Activate();
+
+            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(shell);
+            PInvoke.User32.ShowWindow(WindowHandle, PInvoke.User32.WindowShowStyle.SW_MAXIMIZE);
         }
 
-        public static MainWindow Window { get; private set; }
         public static IntPtr WindowHandle { get; private set; }
     }
 

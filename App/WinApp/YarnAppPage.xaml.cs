@@ -85,14 +85,7 @@ namespace YarnNinja.App.WinApp
 
             StorageFile file = await openFileDialog.PickSingleFileAsync();
 
-            if (file != null)
-            {
-                brogressBar.IsActive = true;
-                brogressBar.Visibility = Visibility.Visible;
-                await OpenYarnAppLogFile(file);
-                brogressBar.IsActive = false;
-                brogressBar.Visibility = Visibility.Collapsed;
-            }
+            
         }
 
         public async Task OpenYarnAppLogFile(StorageFile file)
