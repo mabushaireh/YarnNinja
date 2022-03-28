@@ -43,7 +43,7 @@ namespace YarnNinja.App.WinApp
             this.InitializeComponent();
             m_AppWindow = GetAppWindowForCurrentWindow();
             m_AppWindow.Title = "Yarn Ninja";
-            rootFrame.Navigate(typeof(YarnAppPage));
+            rootFrame.Navigate(typeof(YarnAppPage_Old));
         }
 
 
@@ -57,7 +57,7 @@ namespace YarnNinja.App.WinApp
 
         internal void OpenYarnAppLogFile(StorageFile file)
         {
-            rootFrame.Navigate(typeof(YarnAppPage), file);
+            rootFrame.Navigate(typeof(YarnAppPage_Old), file);
 
         }
     }

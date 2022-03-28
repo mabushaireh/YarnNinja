@@ -1,4 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,20 +9,34 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using YarnNinja.App.WinApp.Services;
+using YarnNinja.App.WinApp.ViewModels;
+using YarnNinja.Common;
 
 namespace YarnNinja.App.WinApp.Views
 {
-    public sealed partial class HomePage : Page
+    public sealed partial class YarnAppPage : Page
     {
-        public HomePage()
+        public YarnApplication YarnApp { get; set; }
+
+        public YarnAppPage()
         {
             InitializeComponent();
         }
 
+
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (e.Parameter != null) {
+                this.YarnApp = e.Parameter as YarnApplication;
+
+                (ViewModel as YarnAppPageViewModel).YarnApp = this.YarnApp;
+            }
+            ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
+            
             base.OnNavigatedTo(e);
         }
 
@@ -31,20 +47,13 @@ namespace YarnNinja.App.WinApp.Views
             base.OnNavigatingFrom(e);
         }
 
-        public ICommand NewCommand => new AsyncRelayCommand(OpenNewDialog);
+        public ICommand CloseCommand => new AsyncRelayCommand(CloseYarnApp);
 
-        public ICommand EditCommand => new AsyncRelayCommand(OpenEditDialog);
-
-        private ICommand UpdateCommand => new RelayCommand(Update);
-
-        private ICommand InsertCommand => new RelayCommand(Insert);
+        
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Current" && ViewModel.HasCurrent)
-            {
-                CharacterListView.ScrollIntoView(ViewModel.Current);
-            }
+            
         }
 
         private void ListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -62,26 +71,22 @@ namespace YarnNinja.App.WinApp.Views
 
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            ViewModel.Filter = args.QueryText;
         }
 
-        private async Task OpenNewDialog()
+        private async Task CloseYarnApp()
         {
-            EditDialog.Title = "New Character";
-            EditDialog.PrimaryButtonText = "Insert";
-            EditDialog.PrimaryButtonCommand = InsertCommand;
-            //*EditDialog.DataContext = new Character();
-            await EditDialog.ShowAsync();
+
+            ((Application.Current as App).Navigation as Shell).CloseYarnApp(this);
         }
 
         private async Task OpenEditDialog()
         {
             EditDialog.Title = "Edit Character";
             EditDialog.PrimaryButtonText = "Update";
-            EditDialog.PrimaryButtonCommand = UpdateCommand;
-            var clone = ViewModel.Current.Clone();
-            clone.Name = ViewModel.Current.Name;
-            EditDialog.DataContext = clone;
+            //EditDialog.PrimaryButtonCommand = UpdateCommand;
+            //var clone = ViewModel.Current.Clone();
+            //clone.Name = ViewModel.Current.Name;
+            //EditDialog.DataContext = clone;
             await EditDialog.ShowAsync();
         }
 

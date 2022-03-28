@@ -18,7 +18,7 @@
     <None Remove="ContainerPage.xaml" />
     <None Remove="Shell.xaml" />
     <None Remove="Views\AboutPage.xaml" />
-    <None Remove="Views\HomePage.xaml" />
+    <None Remove="Views\YarnAppPage.xaml" />
     <None Remove="YarnAppPage.xaml" />
   </ItemGroup>
 
@@ -64,7 +64,7 @@
     <Page Update="Views\AboutPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\HomePage.xaml">
+    <Page Update="Views\YarnAppPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

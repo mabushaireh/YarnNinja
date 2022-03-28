@@ -12,12 +12,14 @@ namespace YarnNinja.App.WinApp
     {
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
-            SetCurrentNavigationViewItem(GetNavigationViewItems(typeof(HomePage)).First());
+            //SetCurrentNavigationViewItem(GetNavigationViewItems(typeof(YarnAppPage)).First());
         }
 
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem);
+            var yarnApp = this.yarnApps.Where(p => p.Header.Id == sender.Header).FirstOrDefault();
+
+            SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem, yarnApp);
         }
 
         public List<NavigationViewItem> GetNavigationViewItems()
@@ -29,7 +31,7 @@ namespace YarnNinja.App.WinApp
 
             foreach (NavigationViewItem mainItem in items)
             {
-            result.AddRange(mainItem.MenuItems.Select(i => (NavigationViewItem)i));
+                result.AddRange(mainItem.MenuItems.Select(i => (NavigationViewItem)i));
             }
 
             return result;
@@ -45,8 +47,9 @@ namespace YarnNinja.App.WinApp
             return GetNavigationViewItems(type).Where(ni => ni.Content.ToString() == title).ToList();
         }
 
-        public void SetCurrentNavigationViewItem(NavigationViewItem item)
+        public void SetCurrentNavigationViewItem(NavigationViewItem item, object obj)
         {
+
             if (item == null)
             {
                 return;
@@ -57,7 +60,14 @@ namespace YarnNinja.App.WinApp
                 return;
             }
 
-            ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), item.Content);
+            if (NavigationView.SelectedItem is not null && (NavigationView.SelectedItem as NavigationViewItem).Content == item.Content)
+            {
+                return;
+            }
+
+
+
+            ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), obj);
             NavigationView.Header = item.Content;
             NavigationView.SelectedItem = item;
         }
@@ -67,9 +77,11 @@ namespace YarnNinja.App.WinApp
             return NavigationView.SelectedItem as NavigationViewItem;
         }
 
-        public void SetCurrentPage(Type type)
+        public void SetCurrentPage(Type type, object obj)
         {
-            ContentFrame.Navigate(type);
+            ContentFrame.Navigate(type, obj);
         }
+
+
     }
 }

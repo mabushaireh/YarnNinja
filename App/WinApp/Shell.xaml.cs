@@ -1,17 +1,21 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using YarnNinja.App.WinApp.Views;
 using YarnNinja.Common;
 
 namespace YarnNinja.App.WinApp
 {
     public sealed partial class Shell : Window
     {
-        private YarnApplication yarnApp;
+        private List<YarnApplication> yarnApps = new();
         BackgroundWorker bgWorker = new BackgroundWorker();
         DoWorkEventHandler handler;
 
@@ -56,38 +60,58 @@ namespace YarnNinja.App.WinApp
 
         }
 
-        public void OpenYarnAppFile(string path)
-        {
-            bgWorker.WorkerReportsProgress = true;
-            handler = (sender, e) =>
-            {
-                bgWorker.ReportProgress(0);
-                OpenYarnAppLogFile(path);
-                bgWorker.ReportProgress(100);
-            };
-
-            bgWorker.DoWork += handler;
-            bgWorker.RunWorkerAsync();
-        }
+        
 
 
         private void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.ProgressPercentage == 0)
             {
-                mainStatusBar.Message = "Yarn App is loading";
+                mainStatusBar.Message = "Yarn App is loading: 0%";
                 mainStatusBar.IsOpen = true;
+                mainStatusBar.Severity = InfoBarSeverity.Informational;
                 mainProgressBar.IsActive = true;
                 mainProgressBar.Visibility = Visibility.Visible;
             }
             else if (e.ProgressPercentage == 100)
             {
+                bgWorker.DoWork -= handler;
                 mainProgressBar.IsActive = false;
                 mainProgressBar.Visibility = Visibility.Collapsed;
-
-                mainStatusBar.Message = "Yarn App Loaded";
                 mainStatusBar.IsOpen = true;
-                bgWorker.DoWork -= handler;
+
+                if (bgWorker.CancellationPending)
+                {
+                    mainStatusBar.Severity = InfoBarSeverity.Error;
+                    mainStatusBar.Message = "Failed to Load App, Application already loaded!";
+                    return;
+                }
+                mainStatusBar.Severity = InfoBarSeverity.Success;
+
+                mainStatusBar.Message = "Yarn App is loading: 100%";
+
+                var navItem = new NavigationViewItem();
+                navItem.Content = this.yarnApps[this.yarnApps.Count-1].Header.Id;
+                navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppPage";
+                navItem.Tapped += (sender, e) => {
+                    ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
+                };
+
+                navItem.Icon = new BitmapIcon()
+                {
+                    UriSource = new Uri("ms-appx:///Assets/Home.png"),
+                    ShowAsMonochrome = false
+                };
+
+                NavigationView.MenuItems.Add(navItem);
+
+                SetCurrentNavigationViewItem(navItem, this.yarnApps[this.yarnApps.Count -1]);
+            }
+            else
+            {
+                mainStatusBar.Severity = InfoBarSeverity.Informational;
+                mainStatusBar.Message = $"Yarn App is loading: {e.ProgressPercentage}%";
+                mainStatusBar.IsOpen = true;
             }
         }
 
@@ -95,17 +119,20 @@ namespace YarnNinja.App.WinApp
         {
             var file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
             var logText = FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
-            this.yarnApp = new Common.YarnApplication(logText);
+            this.bgWorker.ReportProgress(25);
+            var yarnApp = new Common.YarnApplication(logText);
+            if (this.yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Count() > 0)
+            {
+                this.bgWorker.ReportProgress(100);
+                bgWorker.CancelAsync();
+                yarnApp = null;
+                return;
+            }
+
+            this.yarnApps.Add(yarnApp);
+            this.bgWorker.ReportProgress(50);
+            RefreshYarnAppInfo();
         }
-
-
-
-        private void OpenYarnAppLogFileAsync(StorageFile file)
-        {
-
-
-        }
-
 
         private async Task RefreshYarnAppInfo()
         {
@@ -118,6 +145,45 @@ namespace YarnNinja.App.WinApp
             var settings = (Application.Current as App).Settings;
             Root.RequestedTheme = settings.IsLightTheme ? ElementTheme.Light : ElementTheme.Dark;
         }
+
+        public void OpenYarnAppFile(string path)
+        {
+            bgWorker.WorkerReportsProgress = true;
+            bgWorker.WorkerSupportsCancellation = true;
+            handler = (sender, e) =>
+            {
+                bgWorker.ReportProgress(0);
+                OpenYarnAppLogFile(path);
+                bgWorker.ReportProgress(100);
+            };
+
+            bgWorker.DoWork += handler;
+            bgWorker.RunWorkerAsync();
+        }
+
+        public void CloseYarnApp(YarnAppPage yarnAppPage)
+        {
+            var yarnAppName = yarnAppPage.YarnApp.Header.Id;
+            var yarnApp = this.yarnApps.Where(p => p.Header.Id == yarnAppName).FirstOrDefault();
+            this.yarnApps.Remove(yarnApp);
+            yarnApp = null;
+            var menuItems = GetNavigationViewItems();
+            var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppName).FirstOrDefault();
+            NavigationView.MenuItems.Remove(menuItem);
+            menuItem = null;
+            if (this.yarnApps.Count > 0)
+            {
+                var select = menuItems.Where(p => p.Content.ToString() == this.yarnApps[this.yarnApps.Count - 1].Header.Id).FirstOrDefault();
+
+                SetCurrentNavigationViewItem(select, this.yarnApps[this.yarnApps.Count - 1]);
+            }
+            else
+            {
+                var select = menuItems.Where(p => p.Content.ToString() == "About").FirstOrDefault();
+                SetCurrentNavigationViewItem(select, null);
+            }
+        }
+            
 
     }
 }

@@ -14,8 +14,8 @@ namespace YarnNinja.App.WinApp.Services
 
         List<NavigationViewItem> GetNavigationViewItems(Type type, string title);
 
-        void SetCurrentNavigationViewItem(NavigationViewItem item);
+        void SetCurrentNavigationViewItem(NavigationViewItem item, object obj);
 
-        void SetCurrentPage(Type type);
+        void SetCurrentPage(Type type, object obj);
     }
 }

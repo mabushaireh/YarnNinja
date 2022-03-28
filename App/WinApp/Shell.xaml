@@ -30,21 +30,22 @@
         <NavigationView x:Name="NavigationView"
                         Loaded="NavigationView_Loaded"
                         SelectionChanged="NavigationView_SelectionChanged"
-                        Header="WnUI i3 Master Detail Sample"
+                        Header="Yarn Ninja"
                         IsBackButtonVisible="Collapsed"
                         Background="Transparent"
                         IsSettingsVisible="False"
-                        Margin="0">
+                        Margin="0" >
 
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Home"
-                                    Tag="YarnNinja.App.WinApp.Views.HomePage"
-                                    ToolTipService.ToolTip="Home">
+                <!--<NavigationViewItem Content="Yarn App"
+                                        
+                                    Tag="YarnNinja.App.WinApp.Views.YarnAppPage"
+                                    ToolTipService.ToolTip="Yarn App">
                     <NavigationViewItem.Icon>
                         <BitmapIcon UriSource="/Assets/Home.png"
                                     ShowAsMonochrome="False" />
                     </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                </NavigationViewItem>-->
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem Content="About"
