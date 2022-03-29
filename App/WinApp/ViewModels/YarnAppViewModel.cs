@@ -24,6 +24,22 @@ namespace YarnNinja.App.WinApp.ViewModels
             } 
         }
 
+        public String Start
+        {
+            get
+            {
+                return YarnApp.Header.Start.ToString("yyyy-MM-dd HH:mm:ss,fff");
+            }
+        }
+
+        public String Finish
+        {
+            get
+            {
+                return YarnApp.Header.Finish.ToString("yyyy-MM-dd HH:mm:ss,fff");
+            }
+        }
+
         protected override void OnActivated()
         {
             base.OnActivated();

@@ -99,8 +99,8 @@
                             Padding="20"
                             Grid.Row="1" Grid.Column="0">
                     <TextBlock><Run Text="Type: " /><Run Text="{x:Bind ViewModel.YarnType, Mode=OneWay}" /></TextBlock>
-                    <TextBlock><Run Text="Start: " /><Run Text="Bind" /></TextBlock>
-                    <TextBlock><Run Text="Finish: " /><Run Text="Bind" /></TextBlock>
+                    <TextBlock><Run Text="Start: " /><Run Text="{x:Bind ViewModel.Start, Mode=OneWay}" /></TextBlock>
+                    <TextBlock><Run Text="Finish: " /><Run Text="{x:Bind ViewModel.Finish, Mode=OneWay}" /></TextBlock>
                 </StackPanel>
                 <StackPanel VerticalAlignment="Top"
                             Padding="20"

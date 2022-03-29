@@ -17,7 +17,9 @@ namespace YarnNinja.App.WinApp
 
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            var yarnApp = this.yarnApps.Where(p => p.Header.Id == sender.Header).FirstOrDefault();
+            if (args.SelectedItemContainer is null) return;
+
+            var yarnApp = this.yarnApps.Where(p => p.Header.Id == (args.SelectedItemContainer as NavigationViewItem).Content.ToString()).FirstOrDefault();
 
             SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem, yarnApp);
         }
@@ -60,10 +62,10 @@ namespace YarnNinja.App.WinApp
                 return;
             }
 
-            if (NavigationView.SelectedItem is not null && (NavigationView.SelectedItem as NavigationViewItem).Content == item.Content)
-            {
-                return;
-            }
+            //if (NavigationView.SelectedItem is not null && (NavigationView.SelectedItem as NavigationViewItem).Content == item.Content)
+            //{
+            //    return;
+            //}
 
 
 
