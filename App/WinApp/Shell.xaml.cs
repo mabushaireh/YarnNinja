@@ -60,7 +60,7 @@ namespace YarnNinja.App.WinApp
 
         }
 
-        
+
 
 
         private void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -91,21 +91,23 @@ namespace YarnNinja.App.WinApp
                 mainStatusBar.Message = "Yarn App is loading: 100%";
 
                 var navItem = new NavigationViewItem();
-                navItem.Content = this.yarnApps[this.yarnApps.Count-1].Header.Id;
+                navItem.Content = this.yarnApps[this.yarnApps.Count - 1].Header.Id;
                 navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppPage";
-                navItem.Tapped += (sender, e) => {
+                navItem.Tapped += (sender, e) =>
+                {
                     ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
                 };
 
+                
                 navItem.Icon = new BitmapIcon()
                 {
-                    UriSource = new Uri("ms-appx:///Assets/Home.png"),
+                    UriSource = new Uri("ms-appx:///Assets/App.png"),
                     ShowAsMonochrome = false
                 };
 
                 NavigationView.MenuItems.Add(navItem);
 
-                SetCurrentNavigationViewItem(navItem, this.yarnApps[this.yarnApps.Count -1]);
+                SetCurrentNavigationViewItem(navItem, this.yarnApps[this.yarnApps.Count - 1]);
             }
             else
             {
@@ -113,6 +115,55 @@ namespace YarnNinja.App.WinApp
                 mainStatusBar.Message = $"Yarn App is loading: {e.ProgressPercentage}%";
                 mainStatusBar.IsOpen = true;
             }
+        }
+
+        internal void CloseYarnAppContainer(YarnAppContainerPage yarnAppContainerPage)
+        {
+            var yarnAppContainerName = yarnAppContainerPage.YarnAppContainer.Id;
+
+            var menuItems = GetNavigationViewItems();
+            var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppContainerName).FirstOrDefault();
+
+
+            var parent = GetParentMenuItem(yarnAppContainerName);
+            parent.MenuItems.Remove(menuItem);
+            menuItem = null;
+
+            var yarnApp = this.yarnApps.Where(p => p.Header.Id == parent.Content.ToString()).FirstOrDefault();
+
+            SetCurrentNavigationViewItem(parent, yarnApp);
+        }
+
+        internal void AddContainer(string yarnApp, string containerId)
+        {
+
+            var parent = GetNavigationViewItems().Where(p => p.Content.ToString() == yarnApp).FirstOrDefault();
+
+            // Check if contianer already open then switch only
+            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == containerId).FirstOrDefault();
+
+            if (navItem == null)
+            {
+                navItem = new NavigationViewItem();
+                navItem.Content = containerId;
+                navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage";
+                navItem.Tapped += (sender, e) =>
+                {
+                    ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
+                };
+
+                navItem.Icon = new BitmapIcon()
+                {
+                    UriSource = new Uri("ms-appx:///Assets/Container.png"),
+                    ShowAsMonochrome = false
+                };
+
+                parent.MenuItems.Add(navItem);
+                parent.IsExpanded = true;
+            }
+
+            navItem.IsSelected = true;
+            SetCurrentNavigationViewItem(navItem, yarnApp);
         }
 
         private void OpenYarnAppLogFile(string path)
@@ -131,14 +182,7 @@ namespace YarnNinja.App.WinApp
 
             this.yarnApps.Add(yarnApp);
             this.bgWorker.ReportProgress(50);
-            RefreshYarnAppInfo();
         }
-
-        private async Task RefreshYarnAppInfo()
-        {
-
-        }
-
 
         private void ApplyTheme()
         {
@@ -183,7 +227,10 @@ namespace YarnNinja.App.WinApp
                 SetCurrentNavigationViewItem(select, null);
             }
         }
-            
 
+        private void NavigationView_Collapsed(NavigationView sender, NavigationViewItemCollapsedEventArgs args)
+        {
+            (args.CollapsedItem as NavigationViewItem).IsExpanded = true;
+        }
     }
 }

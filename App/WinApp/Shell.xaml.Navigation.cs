@@ -17,11 +17,41 @@ namespace YarnNinja.App.WinApp
 
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
+            
+            Object obj;
+
             if (args.SelectedItemContainer is null) return;
 
-            var yarnApp = this.yarnApps.Where(p => p.Header.Id == (args.SelectedItemContainer as NavigationViewItem).Content.ToString()).FirstOrDefault();
+            if ((args.SelectedItemContainer as NavigationViewItem).Content.ToString().StartsWith("container"))
+            {
+                NavigationViewItem parentMenuItem = GetParentMenuItem((args.SelectedItemContainer as NavigationViewItem).Content.ToString());
 
-            SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem, yarnApp);
+                var yarnAppId = parentMenuItem.Content.ToString();
+
+                var yarnApp = this.yarnApps.Where(p => p.Header.Id == yarnAppId).FirstOrDefault();
+                obj = yarnApp.Containers.Where(p => p.Id == (args.SelectedItemContainer as NavigationViewItem).Content.ToString()).FirstOrDefault();
+            }
+            else
+            {
+                obj = this.yarnApps.Where(p => p.Header.Id == (args.SelectedItemContainer as NavigationViewItem).Content.ToString()).FirstOrDefault();
+            }
+
+            SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem, obj);
+            (args.SelectedItemContainer as NavigationViewItem).IsExpanded = true;
+
+        }
+
+        private NavigationViewItem GetParentMenuItem(string menuName)
+        {
+
+            List<NavigationViewItem> result = new();
+            var items = NavigationView.MenuItems.Select(i => (NavigationViewItem)i).ToList();
+            foreach (var item in items)
+            {
+                var child = item.MenuItems.Where(p => (p as NavigationViewItem).Content.ToString() == menuName).FirstOrDefault();
+                if (child != null) return item;
+            }
+            throw new Exception("Failed to get Parent menu item!");
         }
 
         public List<NavigationViewItem> GetNavigationViewItems()
@@ -61,12 +91,6 @@ namespace YarnNinja.App.WinApp
             {
                 return;
             }
-
-            //if (NavigationView.SelectedItem is not null && (NavigationView.SelectedItem as NavigationViewItem).Content == item.Content)
-            //{
-            //    return;
-            //}
-
 
 
             ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), obj);

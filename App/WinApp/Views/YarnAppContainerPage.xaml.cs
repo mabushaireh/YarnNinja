@@ -12,11 +12,11 @@ using YarnNinja.Common;
 
 namespace YarnNinja.App.WinApp.Views
 {
-    public sealed partial class YarnAppPage : Page
+    public sealed partial class YarnAppContainerPage : Page
     {
-        public YarnApplication YarnApp { get; set; }
+        public YarnApplicationContainer YarnAppContainer { get; set; }
 
-        public YarnAppPage()
+        public YarnAppContainerPage()
         {
             InitializeComponent();
         }
@@ -26,9 +26,9 @@ namespace YarnNinja.App.WinApp.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.Parameter != null) {
-                this.YarnApp = e.Parameter as YarnApplication;
+                this.YarnAppContainer = e.Parameter as YarnApplicationContainer;
 
-                (ViewModel as YarnAppPageViewModel).YarnApp = this.YarnApp;
+                //(ViewModel as YarnAppPageViewModel).YarnApp = this.YarnAppContainer;
             }
             ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -44,28 +44,18 @@ namespace YarnNinja.App.WinApp.Views
             base.OnNavigatingFrom(e);
         }
 
-        public ICommand CloseCommand => new AsyncRelayCommand(CloseYarnApp);
-        //public ICommand OpenContainersCommand => new AsyncRelayCommand(OpenEditDialog);
+        public ICommand CloseCommand => new AsyncRelayCommand(CloseYarnAppContainer);
 
 
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Current" && ViewModel.HasCurrent)
-            {
-                WorkersListView.ScrollIntoView(ViewModel.Current);
-                ContainersDataGrid.ItemsSource = null;
-                ContainersDataGrid.ItemsSource = ViewModel.Containers;
-
-
-            }
+           
         }
 
         private void ListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
-            {
-            }
+            
         }
 
         private void ListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -76,26 +66,16 @@ namespace YarnNinja.App.WinApp.Views
         {
         }
 
-        private async Task CloseYarnApp()
+        private async Task CloseYarnAppContainer()
         {
-
-            ((Application.Current as App).Navigation as Shell).CloseYarnApp(this);
+            ((Application.Current as App).Navigation as Shell).CloseYarnAppContainer(this);
         }
 
 
 
         private void ContainersDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            if (!(sender is DataGrid))
-            {
-                return;
-            }
-
-            var dgrid = sender as DataGrid;
            
-
-            var selectedContainer = dgrid.SelectedItem as YarnApplicationContainer;
-            ((Application.Current as App).Navigation as Shell).AddContainer(YarnApp.Header.Id, selectedContainer.Id);
         }
     }
 }

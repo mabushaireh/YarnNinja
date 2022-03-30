@@ -10,19 +10,11 @@
     <Grid x:Name="Root"
           Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           VerticalAlignment="Stretch"
-          HorizontalAlignment="Stretch">
-        <!--<Grid.Resources>
-            <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
-                          TintColor="{StaticResource SystemChromeMediumLowColor}"
-                          TintOpacity="0"
-                          TintLuminosityOpacity="0"
-                          FallbackColor="{StaticResource SystemChromeMediumLowColor}" />
-        </Grid.Resources>-->
-
+          HorizontalAlignment="Stretch" >
         <!-- Background -->
         <Image Stretch="UniformToFill"
                Opacity="{ThemeResource BackgroundOpacity}"
-               Source="/Assets/Background.jpg"
+               Source="/Assets/SplashScreen.scale-200.png"
                HorizontalAlignment="Left"
                VerticalAlignment="Center" />
 
@@ -33,19 +25,10 @@
                         Header="Yarn Ninja"
                         IsBackButtonVisible="Collapsed"
                         Background="Transparent"
-                        IsSettingsVisible="False"
-                        Margin="0" >
+                        IsSettingsVisible="False"             
+                        Margin="0" Collapsed="NavigationView_Collapsed">
 
             <NavigationView.MenuItems>
-                <!--<NavigationViewItem Content="Yarn App"
-                                        
-                                    Tag="YarnNinja.App.WinApp.Views.YarnAppPage"
-                                    ToolTipService.ToolTip="Yarn App">
-                    <NavigationViewItem.Icon>
-                        <BitmapIcon UriSource="/Assets/Home.png"
-                                    ShowAsMonochrome="False" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>-->
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem Content="About"
@@ -56,9 +39,15 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
                 <Frame x:Name="ContentFrame"
-                   Padding="20">
+                   Padding="10" Grid.Row="0">
                     <!--<Frame.ContentTransitions>
                     <TransitionCollection>
                         <NavigationThemeTransition>
@@ -73,11 +62,10 @@
     IsOpen="False"
     Severity="Informational"
     Title="Yarn Ninja"
-    Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
+    Message="Essential app message for your users to be informed of, acknowledge, or take action on." Grid.Row="1"/>
                 <ProgressRing Width="50" Height="50" VerticalAlignment="Center" 
-                 HorizontalAlignment="Center" IsActive="True" Name="mainProgressBar" Visibility="Collapsed" />
-
-            </StackPanel>
+                 HorizontalAlignment="Center" IsActive="True" Name="mainProgressBar" Visibility="Collapsed" Grid.Row="2"/>
+            </Grid>
 
         </NavigationView>
 
@@ -110,7 +98,7 @@
                  Width="142"
                  Margin="0,0,8,8">
             <Canvas Height="80"
-                    Width="200"
+                    Width="300"
                     Background="Transparent">
                 <Canvas>
                     <Viewbox Height="70"
@@ -129,9 +117,17 @@
                     </Viewbox>
                 </Canvas>
 
-                <Grid Width="200"
-                      Height="80" >
-                    <TextBlock Foreground="SlateGray"
+                <Grid Width="300"
+                      Height="80">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="/Assets/StoreLogo.png"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center" Grid.Column="0"/>
+                    
+                    <TextBlock Grid.Column="1" Foreground="SlateGray"
                                FontSize="24"
                                FontWeight="SemiBold"
                                VerticalAlignment="Bottom"
