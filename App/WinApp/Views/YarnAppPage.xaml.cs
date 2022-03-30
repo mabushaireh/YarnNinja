@@ -95,7 +95,7 @@ namespace YarnNinja.App.WinApp.Views
            
 
             var selectedContainer = dgrid.SelectedItem as YarnApplicationContainer;
-            ((Application.Current as App).Navigation as Shell).AddContainer(YarnApp.Header.Id, selectedContainer.Id);
+            ((Application.Current as App).Navigation as Shell).AddContainer(YarnApp, selectedContainer);
         }
     }
 }

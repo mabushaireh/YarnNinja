@@ -134,18 +134,18 @@ namespace YarnNinja.App.WinApp
             SetCurrentNavigationViewItem(parent, yarnApp);
         }
 
-        internal void AddContainer(string yarnApp, string containerId)
+        internal void AddContainer(YarnApplication yarnApp, YarnApplicationContainer container)
         {
 
-            var parent = GetNavigationViewItems().Where(p => p.Content.ToString() == yarnApp).FirstOrDefault();
+            var parent = GetNavigationViewItems().Where(p => p.Content.ToString() == yarnApp.Header.Id).FirstOrDefault();
 
             // Check if contianer already open then switch only
-            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == containerId).FirstOrDefault();
+            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == container.Id).FirstOrDefault();
 
             if (navItem == null)
             {
                 navItem = new NavigationViewItem();
-                navItem.Content = containerId;
+                navItem.Content = container.Id;
                 navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage";
                 navItem.Tapped += (sender, e) =>
                 {
@@ -163,7 +163,7 @@ namespace YarnNinja.App.WinApp
             }
 
             navItem.IsSelected = true;
-            SetCurrentNavigationViewItem(navItem, yarnApp);
+            SetCurrentNavigationViewItem(navItem, container);
         }
 
         private void OpenYarnAppLogFile(string path)

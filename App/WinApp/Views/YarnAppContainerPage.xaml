@@ -16,118 +16,83 @@
         <viewmodels:YarnAppContainerPageViewModel x:Name="ViewModel" />
     </Page.DataContext>
     <Grid Margin="0 0 0 0"
-          ColumnSpacing="3"
-          RowSpacing="3">
+        ColumnSpacing="3"
+        RowSpacing="3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.2*" />
             <ColumnDefinition Width="0.8*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
         <Grid HorizontalAlignment="Stretch"
-              Background="{StaticResource SystemAccentColorBrush}"
-              Margin="0 0 0 16"
-              CornerRadius="4"
-              Height="52"
-              Grid.ColumnSpan="2" Grid.Row="0" >
+          Background="{StaticResource SystemAccentColorBrush}"
+          Margin="0 0 0 16"
+          CornerRadius="4"
+          Height="52"
+          Grid.ColumnSpan="2" Grid.Row="0" >
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
             <AutoSuggestBox QuerySubmitted="SearchBox_QuerySubmitted"
-                            QueryIcon="Find"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            Margin="8 0" />
+                      QueryIcon="Find"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      Margin="8 0" Grid.Column="0"/>
 
+            
             <CommandBar Background="Transparent"
-                        DefaultLabelPosition="Right"
-                        Grid.Column="1">
+                  DefaultLabelPosition="Right"
+                  Grid.Column="1" Padding="12">
+                <AppBarElementContainer>
+                    <TextBlock Text="Show:" FontSize="12" FontWeight="Bold" Padding="0 15 5 0"/>
+                </AppBarElementContainer>
+                <AppBarToggleButton Label="Error">
+                    <AppBarToggleButton.Content>
+                        <FontIcon Glyph="&#xE783;" FontFamily="Segoe MDL2 Assets"/>
+                    </AppBarToggleButton.Content>
+                </AppBarToggleButton>
+                <AppBarToggleButton Label="Warnings">
+                    <AppBarToggleButton.Content>
+                        <FontIcon Glyph="&#xE7BA;" FontFamily="Segoe MDL2 Assets"/>
+                    </AppBarToggleButton.Content>
+                </AppBarToggleButton>
+                <AppBarToggleButton Label="Info" MinWidth="60">
+                    <AppBarToggleButton.Content>
+                        <FontIcon Glyph="&#xE7BA;" FontFamily="Segoe MDL2 Assets"/>
+                    </AppBarToggleButton.Content>
+                </AppBarToggleButton>
+                <AppBarToggleButton Label="Debug" >
+                    <AppBarToggleButton.Content>
+                        <FontIcon Glyph="&#xE773;" FontFamily="Segoe MDL2 Assets"/>
+                    </AppBarToggleButton.Content>
+                </AppBarToggleButton>
+                <AppBarToggleButton Label="Verbose" >
+                    <AppBarToggleButton.Content>
+                        <FontIcon Glyph="&#xE82F;" FontFamily="Segoe MDL2 Assets"/>
+                    </AppBarToggleButton.Content>
+                </AppBarToggleButton>
+                <AppBarSeparator/>
                 <AppBarButton Command="{x:Bind CloseCommand, Mode=OneWay}"
-                              Icon="Cancel"
-                              Label="Close" />
+                      Icon="Cancel"
+                      Label="Close" />
             </CommandBar>
         </Grid>
-        <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid Padding="0 0 20 20" Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <Border CornerRadius="4"
-                        Grid.RowSpan="2" Grid.ColumnSpan="2">
-                    <Border.Background>
-                        <SolidColorBrush Color="{StaticResource SystemAccentColor}"
-                                         Opacity=".1" />
-                    </Border.Background>
-                </Border>
-                <Border CornerRadius="4"
-                        Height="30" Grid.ColumnSpan="2">
-                    <Border.Background>
-                        <SolidColorBrush Color="{StaticResource SystemAltHighColor}"
-                                         Opacity=".2" />
-                    </Border.Background>
-                    <TextBlock VerticalAlignment="Center"
-                               Padding="20 4">Application</TextBlock>
-                </Border>
-                <StackPanel VerticalAlignment="Top"
-                            Padding="20"
-                            Grid.Row="1" Grid.Column="0">
-                    <TextBlock><Run FontWeight="Bold" Text="Type: " /><Run Text="Bind" /></TextBlock>
-                    <TextBlock><Run FontWeight="Bold" Text="Start: " /><Run Text="Bind" /></TextBlock>
-                    <TextBlock><Run FontWeight="Bold" Text="Finish: " /><Run Text="Bind" /></TextBlock>
-                </StackPanel>
-                <StackPanel VerticalAlignment="Top"
-                            Padding="20"
-                            Grid.Row="1" Grid.Column="1">
-                    <TextBlock><Run FontWeight="Bold" Text="Duration: " /><Run Text="Bind" /></TextBlock>
-                    <TextBlock><Run FontWeight="Bold" Text="N0. of Containers: " /><Run Text="Bind" /></TextBlock>
-                    <TextBlock><Run FontWeight="Bold" Text="Status: " /><Run Text="Bind" /></TextBlock>
-                </StackPanel>
-            </Grid>
-        </Grid>
+
 
         <!--ItemsSource="{x:Bind ViewModel.WorkerNodes, Mode=OneWay}"
                   SelectedItem="{x:Bind ViewModel.Current, Mode=TwoWay}"-->
         <ListView x:Name="LogTypesListView"
-                  Grid.Row="2" Grid.Column="0" Header="LogTypes">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:WorkerNode">
-                    <UserControl PointerEntered="ListViewItem_PointerEntered"
-                                 PointerExited="ListViewItem_PointerExited">
-                        <RelativePanel Background="Transparent">
-
-                            <TextBlock RelativePanel.AlignLeftWithPanel="True"
-                                       RelativePanel.AlignVerticalCenterWithPanel="True"
-                                       Margin="0 0" ToolTipService.ToolTip="{x:Bind Name, Mode=OneWay}">
-                                <Run Text="{x:Bind Name, Mode=OneWay}"
-                                     FontWeight="SemiBold" />
-                                <LineBreak />
-
-                            </TextBlock>
-                        </RelativePanel>
-                    </UserControl>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+              Grid.Row="2" Grid.Column="0" Header="LogTypes" ItemsSource="{x:Bind ViewModel.LogTypes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Current, Mode=TwoWay}" />
         <!--ItemsSource="{x:Bind ViewModel.Containers, Mode=OneWay}"
                           SelectedItem="{x:Bind ViewModel.CurrentContainer, Mode=TwoWay}"-->
-        <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
+            <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
                           
-                          x:Name="LogLinesDataGrid" Height="Auto" Width="Auto" 
-                          Margin="12" AutoGenerateColumns="True" IsReadOnly="True" 
-                                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >
+                      x:Name="LogLinesDataGrid" Height="Auto" Width="Auto"
+                      Margin="12" AutoGenerateColumns="True" IsReadOnly="True"
+                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >
             <!--<ctWinUI:DataGrid.Columns>
                 <ctWinUI:DataGridTextColumn 
                                 Header="Container Name" 

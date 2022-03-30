@@ -21,8 +21,29 @@ namespace YarnNinja.App.WinApp.ViewModels
             
         }
 
-       
-      
+        private string current;
+        public bool HasCurrent => current is not null;
+
+        public string Current
+        {
+            get => current;
+            set
+            {
+                SetProperty(ref current, value);
+                OnPropertyChanged(nameof(HasCurrent));
+            }
+        }
+
+
+        public List<string> LogTypes
+        {
+            get
+            {
+                return YarnAppContainer.Logs.Select(p => p.YarnLogType).Distinct().OrderBy(p => p).ToList();
+            }
+        }
+
+
         protected override void OnActivated()
         {
             base.OnActivated();

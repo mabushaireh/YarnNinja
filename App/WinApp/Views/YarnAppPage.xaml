@@ -149,8 +149,6 @@
                                        Margin="0 0" ToolTipService.ToolTip="{x:Bind Name, Mode=OneWay}">
                                 <Run Text="{x:Bind Name, Mode=OneWay}"
                                      FontWeight="SemiBold" />
-                                <LineBreak />
-
                             </TextBlock>
                         </RelativePanel>
                     </UserControl>

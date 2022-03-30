@@ -28,7 +28,7 @@ namespace YarnNinja.App.WinApp.Views
             if (e.Parameter != null) {
                 this.YarnAppContainer = e.Parameter as YarnApplicationContainer;
 
-                //(ViewModel as YarnAppPageViewModel).YarnApp = this.YarnAppContainer;
+                (ViewModel as YarnAppContainerPageViewModel).YarnAppContainer = this.YarnAppContainer;
             }
             ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
