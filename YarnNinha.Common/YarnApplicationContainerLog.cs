@@ -18,13 +18,13 @@ namespace YarnNinja.Common
     }
     public class YarnApplicationContainerLog
     {
-        internal const string yarnLogLineTezPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) \\[(\\w*)\\] \\[(.*)\\] \\|(.*)\\|: (.*)";
-        internal const string yarnLogLineTezSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\[\\w*\\] \\[.*\\] \\|.*\\|: ";
+        internal const string yarnLogLineTezPattern = "(?<TimeStamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (?:\\[(?<TraceLevel>.*)\\]|(?<TraceLevel>.*)) \\[(?<Function>.*)\\] \\|?(?<Module>.*?)\\|?:";
+        internal const string yarnLogLineTezSplitPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} (?:\\[.*\\]|.*) \\[.*\\] \\|?.*?\\|?:)";
 
         internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
         internal const string yarnLogLineMapredSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\w* \\[.*\\] .*?: ";
 
-        private List<YarnApplicationLogLine> logLines = null;
+        private List<YarnApplicationLogLine> logLines;
         public string YarnLogType { get; set; }
         public LogType BaseLogType
         {
@@ -65,7 +65,7 @@ namespace YarnNinja.Common
         {
             get
             {
-                if (logLines is null || logLines.Count == 0)
+                if (logLines is null)
                 {
                     logLines = new List<YarnApplicationLogLine>();
                     ParseLogsAsync().Wait();
@@ -86,7 +86,7 @@ namespace YarnNinja.Common
 
         private async Task ParseLogsAsync()
         {
-            if (this.BaseLogType == LogType.launch_container_sh || this.BaseLogType == LogType.directory_info)
+            if (this.BaseLogType != LogType.syslog && this.BaseLogType != LogType.container_localizer_syslog)
             {
                 var result = LogText.Split(new[] { '\r', '\n' });
                 foreach (var line in result)
@@ -103,7 +103,7 @@ namespace YarnNinja.Common
                 Regex l = null;
                 if (this.YarnApplicationType == Core.YarnApplicationType.Tez)
                 {
-                    r = new Regex(yarnLogLineTezPattern, RegexOptions.None);
+                    r = new Regex(yarnLogLineTezPattern, RegexOptions.Singleline);
                     l = new Regex(yarnLogLineTezSplitPattern, RegexOptions.None);
                 }
 
@@ -115,52 +115,53 @@ namespace YarnNinja.Common
                 else
                     throw new Exception("Spark Logs is not implemeneted yet!");
 
-                var lines = l.Split(LogText);
-                //Remove first match because we know it doent count
-                lines = lines.Where((source, index) => index != 0).ToArray();
-                var i = 0;
-                Match m = r.Match(LogText);
-                while (m.Success)
+                //FIXME: added new line at the end to make split works
+                var txt = LogText + Environment.NewLine;
+
+                var lines = l.Split(txt);
+                //Remove empty lines
+                lines = lines.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+                for (int i =0; i < lines.Length; i += 2)
                 {
-                    Group timestampg = m.Groups[1];
-                    Group traceLevelg = m.Groups[2];
-                    Group functiong = m.Groups[3];
-                    Group moduleg = m.Groups[4];
-                    Group msgg = m.Groups[5];
 
-                    if (!lines[i].StartsWith(msgg.Captures[0].Value.Trim())) {
-                        throw new Exception("Parse lines failed!");
-                    }
-                    var logLine = new YarnApplicationLogLine
+                    Match m = r.Match(lines[i]);
+                    if (m.Success)
                     {
-                        Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss,fff", null),
-                        Function = functiong.Captures[0].Value.Trim(),
-                        Module = moduleg.Captures[0].Value.Trim(),
-                        Msg = lines[i++]
+                        Group timestampg = m.Groups["TimeStamp"];
+                        Group traceLevelg = m.Groups["TraceLevel"];
+                        Group functiong = m.Groups["Function"];
+                        Group moduleg = m.Groups["Module"];
 
+                        var logLine = new YarnApplicationLogLine
+                        {
+                            Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss,fff", null),
+                            Function = functiong.Captures[0].Value.Trim(),
+                            Module = moduleg.Captures[0].Value.Trim(),
+                            Msg = lines[i + 1].Trim()
                     };
 
-                    var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
-                    switch (traceLevelstr)
-                    {
-                        case "INFO":
-                            logLine.TraceLevel = TraceLevel.INFO;
-                            break;
-                        case "WARN":
-                            logLine.TraceLevel = TraceLevel.WARN;
-                            break;
-                        case "ERROR":
-                            logLine.TraceLevel = TraceLevel.ERROR;
-                            break;
-                        case "DEBUG":
-                            logLine.TraceLevel = TraceLevel.DEBUG;
-                            break;
-                        default:
-                            logLine.TraceLevel = TraceLevel.UNKNOWN;
-                            break;
+                        var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
+                        switch (traceLevelstr)
+                        {
+                            case "INFO":
+                                logLine.TraceLevel = TraceLevel.INFO;
+                                break;
+                            case "WARN":
+                                logLine.TraceLevel = TraceLevel.WARN;
+                                break;
+                            case "ERROR":
+                                logLine.TraceLevel = TraceLevel.ERROR;
+                                break;
+                            case "DEBUG":
+                                logLine.TraceLevel = TraceLevel.DEBUG;
+                                break;
+                            default:
+                                logLine.TraceLevel = TraceLevel.UNKNOWN;
+                                break;
+                        }
+                        this.logLines.Add(logLine);
                     }
-                    this.logLines.Add(logLine);
-                    m = m.NextMatch();
+
                 }
             }
 

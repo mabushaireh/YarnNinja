@@ -23,7 +23,7 @@ namespace YarnNinja.Common
     public class YarnApplication
     {
         internal const string applicationIdPattern = "application_\\d+_\\d{4,}";
-        internal const string containerLogPattern = "Container: (.*?) on (.*?)(LogAggregationType.*?)End of LogType:(.*?)[\\*]+";
+        internal const string containerLogPattern = "Container: (.*?) on (.*?)LogAggregationType:.*?LogContents:(.*?)End of LogType:(.*?)[\\*]+";
         const string applicationExsitStausTezPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
         const string applicationExsitStausMapredPattern = "Final Stats: PendingReds:(\\d*) ScheduledMaps:(\\d*) ScheduledReds:(\\d*) AssignedMaps:(\\d*) AssignedReds:(\\d*) CompletedMaps:(\\d*) CompletedReds:(\\d*) ContAlloc:(\\d*) ContRel:(\\d*) HostLocal:(\\d*) RackLocal:(\\d*)";
         const string userPattern = "export USER=\"(.*?)\"";
