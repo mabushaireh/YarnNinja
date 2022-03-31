@@ -6,7 +6,6 @@
       xmlns:models="using:YarnNinja.App.WinApp.Models"
       xmlns:viewmodels="using:YarnNinja.App.WinApp.ViewModels"
       xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:localprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
       mc:Ignorable="d"
       Background="Transparent">
 
@@ -88,41 +87,12 @@
               Grid.Row="2" Grid.Column="0" Header="LogTypes" ItemsSource="{x:Bind ViewModel.LogTypes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Current, Mode=TwoWay}" />
         <!--ItemsSource="{x:Bind ViewModel.Containers, Mode=OneWay}"
                           SelectedItem="{x:Bind ViewModel.CurrentContainer, Mode=TwoWay}"-->
-            <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
-                          
+        <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
+                          ItemsSource="{x:Bind ViewModel.ContainersLogTypeLines, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.CurrentContainerLogLine, Mode=TwoWay}"
                       x:Name="LogLinesDataGrid" Height="Auto" Width="Auto"
                       Margin="12" AutoGenerateColumns="True" IsReadOnly="True"
                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >
-            <!--<ctWinUI:DataGrid.Columns>
-                <ctWinUI:DataGridTextColumn 
-                                Header="Container Name" 
-                                Binding="{Binding Id}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Start" 
-                                Binding="{Binding Start}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Finish" 
-                                Binding="{Binding Finish}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Duration" 
-                                Binding="{Binding Duration}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Status Code" 
-                                Binding="{Binding StatusCode}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Status Time" 
-                                Binding="{Binding StatusTime}" 
-                                FontSize="12" />
-                <ctWinUI:DataGridTextColumn 
-                                Header="Status Message" 
-                                Binding="{Binding StatusMessage}" 
-                                FontSize="12"/>
-            </ctWinUI:DataGrid.Columns>-->
         </ctWinUI:DataGrid>
     </Grid>
 </Page>

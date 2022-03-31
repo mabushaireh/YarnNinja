@@ -50,7 +50,12 @@ namespace YarnNinja.App.WinApp.Views
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-           
+            if (e.PropertyName == "Current" && ViewModel.HasCurrent)
+            {
+                LogTypesListView.ScrollIntoView(ViewModel.CurrentContainerLogLine);
+                LogLinesDataGrid.ItemsSource = null;
+                LogLinesDataGrid.ItemsSource = ViewModel.ContainersLogTypeLines;
+            }
         }
 
         private void ListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)

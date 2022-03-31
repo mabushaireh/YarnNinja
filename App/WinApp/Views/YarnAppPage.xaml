@@ -6,7 +6,6 @@
       xmlns:models="using:YarnNinja.App.WinApp.Models"
       xmlns:viewmodels="using:YarnNinja.App.WinApp.ViewModels"
       xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:localprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
       mc:Ignorable="d"
       Background="Transparent">
 

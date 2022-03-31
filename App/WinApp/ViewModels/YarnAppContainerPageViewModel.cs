@@ -43,6 +43,33 @@ namespace YarnNinja.App.WinApp.ViewModels
             }
         }
 
+        private YarnApplicationLogLine currentContainerLogLine;
+        public bool HasCurrentContainerLogLine => currentContainerLogLine is not null;
+
+        public YarnApplicationLogLine CurrentContainerLogLine
+        {
+            get => currentContainerLogLine;
+            set
+            {
+                SetProperty(ref currentContainerLogLine, value);
+                OnPropertyChanged(nameof(HasCurrentContainerLogLine));
+            }
+        }
+
+        public List<YarnApplicationLogLine> ContainersLogTypeLines
+        {
+            get
+            {
+                if (!HasCurrent)
+                    return new List<YarnApplicationLogLine>();
+
+                var containersLogTypeLines = YarnAppContainer.GetLogsByType(Current);
+
+                return containersLogTypeLines;
+            }
+
+            set { }
+        }
 
         protected override void OnActivated()
         {
