@@ -55,8 +55,8 @@ namespace YarnNinja.App.WinApp
             WinRT.Interop.InitializeWithWindow.Initialize(openFileDialog, App.WindowHandle);
 
             var file = await openFileDialog.PickSingleFileAsync();
-
-            OpenYarnAppFile(file.Path);
+            if (file != null)
+                OpenYarnAppFile(file.Path);
 
         }
 

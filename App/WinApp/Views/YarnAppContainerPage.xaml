@@ -42,37 +42,37 @@
                       Margin="8 0" Grid.Column="0"/>
 
             
-            <CommandBar Background="Transparent"
+            <CommandBar Background="Transparent" DataContext=""
                   DefaultLabelPosition="Right"
                   Grid.Column="1" Padding="12">
                 <AppBarElementContainer>
                     <TextBlock Text="Show:" FontSize="12" FontWeight="Bold" Padding="0 15 5 0"/>
                 </AppBarElementContainer>
-                <AppBarToggleButton Label="Error">
+                <AppBarToggleButton Label="Error" IsChecked="{x:Bind ViewModel.ShowErrors, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.HasCurrent, Mode=OneWay}">
                     <AppBarToggleButton.Content>
                         <FontIcon Glyph="&#xE783;" FontFamily="Segoe MDL2 Assets"/>
                     </AppBarToggleButton.Content>
                 </AppBarToggleButton>
-                <AppBarToggleButton Label="Warnings">
+                <AppBarToggleButton Label="Warnings"  IsChecked="{x:Bind ViewModel.ShowWarnings, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.HasCurrent, Mode=OneWay}">
                     <AppBarToggleButton.Content>
                         <FontIcon Glyph="&#xE7BA;" FontFamily="Segoe MDL2 Assets"/>
                     </AppBarToggleButton.Content>
                 </AppBarToggleButton>
-                <AppBarToggleButton Label="Info" MinWidth="60">
+                <AppBarToggleButton Label="Info" MinWidth="60"  IsChecked="{x:Bind ViewModel.ShowInfo, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.HasCurrent, Mode=OneWay}">
                     <AppBarToggleButton.Content>
                         <FontIcon Glyph="&#xE7BA;" FontFamily="Segoe MDL2 Assets"/>
                     </AppBarToggleButton.Content>
                 </AppBarToggleButton>
-                <AppBarToggleButton Label="Debug" >
+                <AppBarToggleButton Label="Debug"  IsChecked="{x:Bind ViewModel.ShowDebug, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.HasCurrent, Mode=OneWay}">
                     <AppBarToggleButton.Content>
                         <FontIcon Glyph="&#xE773;" FontFamily="Segoe MDL2 Assets"/>
                     </AppBarToggleButton.Content>
                 </AppBarToggleButton>
-                <AppBarToggleButton Label="Verbose" >
+                <!--<AppBarToggleButton Label="Verbose"  IsChecked="True" IsEnabled="{x:Bind ViewModel.HasCurrent, Mode=OneWay}">
                     <AppBarToggleButton.Content>
                         <FontIcon Glyph="&#xE82F;" FontFamily="Segoe MDL2 Assets"/>
                     </AppBarToggleButton.Content>
-                </AppBarToggleButton>
+                </AppBarToggleButton>-->
                 <AppBarSeparator/>
                 <AppBarButton Command="{x:Bind CloseCommand, Mode=OneWay}"
                       Icon="Cancel"

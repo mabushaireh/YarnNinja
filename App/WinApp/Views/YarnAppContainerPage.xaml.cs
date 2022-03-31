@@ -52,7 +52,12 @@ namespace YarnNinja.App.WinApp.Views
         {
             if (e.PropertyName == "Current" && ViewModel.HasCurrent)
             {
-                LogTypesListView.ScrollIntoView(ViewModel.CurrentContainerLogLine);
+                LogTypesListView.ScrollIntoView(ViewModel.Current);
+                LogLinesDataGrid.ItemsSource = null;
+                LogLinesDataGrid.ItemsSource = ViewModel.ContainersLogTypeLines;
+            }
+            else if (e.PropertyName.StartsWith("Show"))
+            {
                 LogLinesDataGrid.ItemsSource = null;
                 LogLinesDataGrid.ItemsSource = ViewModel.ContainersLogTypeLines;
             }

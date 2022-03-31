@@ -6,14 +6,6 @@ using System.Threading.Tasks;
 
 namespace YarnNinja.Common.Core
 {
-    public enum TraceLevel
-    {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR,
-        FATAL
-    }
 
     public enum YarnApplicationType
     {

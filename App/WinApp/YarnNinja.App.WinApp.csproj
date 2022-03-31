@@ -17,12 +17,10 @@
     <None Remove="Assets\app.png" />
     <None Remove="Assets\Container.png" />
     <None Remove="Assets\Home.png" />
-    <None Remove="ContainerPage.xaml" />
     <None Remove="Shell.xaml" />
     <None Remove="Views\AboutPage.xaml" />
     <None Remove="Views\YarnAppContainerPage.xaml" />
     <None Remove="Views\YarnAppPage.xaml" />
-    <None Remove="YarnAppPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,17 +52,9 @@
     <ProjectReference Include="..\..\YarnNinha.Common\YarnNinja.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContainerPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\YarnAppContainerPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="YarnAppPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

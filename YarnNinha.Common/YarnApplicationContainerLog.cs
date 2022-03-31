@@ -5,7 +5,6 @@ namespace YarnNinja.Common
 {
     public enum LogType
     {
-        container_localizer_syslog,
         directory_info,
         launch_container_sh,
         prelaunch_err,
@@ -33,7 +32,7 @@ namespace YarnNinja.Common
                 switch (YarnLogType)
                 {
                     case "container-localizer-syslog":
-                        return LogType.container_localizer_syslog;
+                        return LogType.syslog;
                     case "directory.info":
                         return LogType.directory_info;
                     case "launch_container.sh":
@@ -51,7 +50,7 @@ namespace YarnNinja.Common
                     default:
                         if (YarnLogType.StartsWith("dag_"))
                             return LogType.DAG;
-                        else if (YarnLogType.StartsWith("syslog_dag"))
+                        else if (YarnLogType.StartsWith("syslog_"))
                             return LogType.syslog;
                         else
                             return LogType.Unknown;
@@ -86,7 +85,7 @@ namespace YarnNinja.Common
 
         private async Task ParseLogsAsync()
         {
-            if (this.BaseLogType != LogType.syslog && this.BaseLogType != LogType.container_localizer_syslog)
+            if (this.BaseLogType != LogType.syslog)
             {
                 var result = LogText.Split(new[] { '\r', '\n' });
                 foreach (var line in result)
