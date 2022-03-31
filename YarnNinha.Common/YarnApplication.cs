@@ -84,16 +84,21 @@ namespace YarnNinja.Common
             {
                 Header.Id = Regex.Match(this.YarnLog, applicationIdPattern).Value;
             }
+            else
+            {
+                throw new InvalidYarnFileFormat("Unable to find the yarn application ID!");
+            }
 
             var isTez = yarnLog.Contains("./tezlib");
             var isMapred = false;
             if (!isTez)
                 isMapred = yarnLog.Contains("./mr-framework");
 
-            Header.Type = (isTez ? Core.YarnApplicationType.Tez : (isMapred ? Core.YarnApplicationType.MapReduce : Core.YarnApplicationType.Spark));
+            Header.Type = (isTez ? Core.YarnApplicationType.Tez : (isMapred ? Core.YarnApplicationType.MapReduce : throw new InvalidYarnFileFormat("Not Support Yarn App Format!")));
 
 
             ParseContainersAsync().Wait();
+
         }
 
 
