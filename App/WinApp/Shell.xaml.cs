@@ -15,8 +15,8 @@ namespace YarnNinja.App.WinApp
 {
     public sealed partial class Shell : Window
     {
-        private List<YarnApplication> yarnApps = new();
-        BackgroundWorker bgWorker = new BackgroundWorker();
+        private readonly List<YarnApplication> yarnApps = new();
+        readonly BackgroundWorker bgWorker = new();
         DoWorkEventHandler handler;
 
         public Shell()
@@ -90,9 +90,11 @@ namespace YarnNinja.App.WinApp
 
                 mainStatusBar.Message = "Yarn App is loading: 100%";
 
-                var navItem = new NavigationViewItem();
-                navItem.Content = this.yarnApps[this.yarnApps.Count - 1].Header.Id;
-                navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppPage";
+                NavigationViewItem navItem = new()
+                {
+                    Content = this.yarnApps[^1].Header.Id,
+                    Tag = "YarnNinja.App.WinApp.Views.YarnAppPage"
+                };
                 navItem.Tapped += (sender, e) =>
                 {
                     ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
@@ -107,7 +109,7 @@ namespace YarnNinja.App.WinApp
 
                 NavigationView.MenuItems.Add(navItem);
 
-                SetCurrentNavigationViewItem(navItem, this.yarnApps[this.yarnApps.Count - 1]);
+                SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
             }
             else
             {
@@ -144,9 +146,12 @@ namespace YarnNinja.App.WinApp
 
             if (navItem == null)
             {
-                navItem = new NavigationViewItem();
-                navItem.Content = container.Id;
-                navItem.Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage";
+                navItem = new()
+                {
+                    Content = container.Id,
+                    Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage"
+                };
+
                 navItem.Tapped += (sender, e) =>
                 {
                     ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
@@ -172,7 +177,7 @@ namespace YarnNinja.App.WinApp
             var logText = FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
             this.bgWorker.ReportProgress(25);
             var yarnApp = new Common.YarnApplication(logText);
-            if (this.yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Count() > 0)
+            if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Any())
             {
                 this.bgWorker.ReportProgress(100);
                 bgWorker.CancelAsync();
@@ -217,9 +222,9 @@ namespace YarnNinja.App.WinApp
             menuItem = null;
             if (this.yarnApps.Count > 0)
             {
-                var select = menuItems.Where(p => p.Content.ToString() == this.yarnApps[this.yarnApps.Count - 1].Header.Id).FirstOrDefault();
+                var select = menuItems.Where(p => p.Content.ToString() == this.yarnApps[^1].Header.Id).FirstOrDefault();
 
-                SetCurrentNavigationViewItem(select, this.yarnApps[this.yarnApps.Count - 1]);
+                SetCurrentNavigationViewItem(select, this.yarnApps[^1]);
             }
             else
             {

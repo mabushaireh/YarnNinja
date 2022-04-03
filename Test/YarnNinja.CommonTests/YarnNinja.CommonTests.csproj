@@ -18,4 +18,20 @@
     <ProjectReference Include="..\..\YarnNinha.Common\YarnNinja.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Samples\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Samples\application_1639352826059_8646.log" Link="Samples\application_1639352826059_8646.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\application_1647350095798_0001.log" Link="Samples\application_1647350095798_0001.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\FakeFile.log" Link="Samples\FakeFile.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

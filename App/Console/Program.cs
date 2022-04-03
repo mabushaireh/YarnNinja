@@ -18,7 +18,7 @@ namespace YarnNinja.App.Console
     }
     class Program
     {
-        private static Window win = new Window("YarnNinja")
+        private static readonly Window win = new ("YarnNinja")
         {
             X = 0,
             Y = 1, // Leave one row for the toplevel menu
@@ -44,9 +44,9 @@ namespace YarnNinja.App.Console
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem[] {
                 new MenuBarItem ("_File", new MenuItem [] {
-                    new MenuItem ("_Open", "Yarn App Log", () => btnOpen()),
+                    new MenuItem ("_Open", "Yarn App Log", () => BtnOpen()),
                     new MenuItem ("_Close", "",null),
-                    new MenuItem ("_Quit", "", () => btnQuit ())
+                    new MenuItem ("_Quit", "", () => BtnQuit ())
                 }),
                 new MenuBarItem ("_Help", new MenuItem [] {
                     new MenuItem ("_Documentation", "", null),
@@ -58,9 +58,7 @@ namespace YarnNinja.App.Console
             top.Add(menu);
 
 
-            var statusBar = new StatusBar(new StatusItem[] {
-
-            });
+            var statusBar = new StatusBar(Array.Empty<StatusItem>());
 
             top.Add(menu);
 
@@ -248,13 +246,13 @@ namespace YarnNinja.App.Console
             }).OrderBy(p => p).ToList());
         }
 
-        private static void btnQuit()
+        private static void BtnQuit()
         {
             var n = MessageBox.Query(50, 7, "Quit Demo", "Are you sure you want to quit this YarnNinja?", "Yes", "No");
             if (n == 0) Application.RequestStop();
         }
 
-        private static void btnOpen()
+        private static void BtnOpen()
         {
 
             var open = new OpenDialog("Open", "Open a file") { AllowsMultipleSelection = true };
@@ -519,7 +517,7 @@ namespace YarnNinja.App.Console
 
             lstLogTypes.SetSource(logtypes);
             lstLogTypes.SelectedItemChanged += (obj) => {
-                lstLogTypes_SelectedItemChanged(container, obj.Value.ToString());
+                LstLogTypes_SelectedItemChanged(container, obj.Value.ToString());
             }  ;
 
             var logContentWin = new Window("Log Content")
@@ -551,7 +549,7 @@ namespace YarnNinja.App.Console
 
         static TextView logContentTxt;
 
-        private static void lstLogTypes_SelectedItemChanged(YarnApplicationContainer container, string selectedLogType)
+        private static void LstLogTypes_SelectedItemChanged(YarnApplicationContainer container, string selectedLogType)
         {
 
             logContentTxt.Text = container.Logs.FirstOrDefault(p => p.YarnLogType == selectedLogType).LogText;
