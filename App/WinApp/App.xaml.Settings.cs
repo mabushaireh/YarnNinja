@@ -64,9 +64,7 @@ namespace YarnNinja.App.WinApp
                 var applicationData = stringWriter.ToString();
                 ApplicationData.Current.LocalSettings.Values[settingsFile] = applicationData;
             }
-#pragma warning disable 0168
-            catch (Exception ex)
-#pragma warning restore 0168
+            catch (Exception)
             {
             }
         }

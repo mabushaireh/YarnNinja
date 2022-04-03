@@ -86,7 +86,7 @@ namespace YarnNinja.App.WinApp.Views
 
         private void ContainersDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            if (!(sender is DataGrid))
+            if (sender is not DataGrid)
             {
                 return;
             }

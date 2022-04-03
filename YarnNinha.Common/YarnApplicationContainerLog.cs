@@ -74,7 +74,7 @@ namespace YarnNinja.Common
             }
         }
 
-        private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
+        private readonly YarnApplicationType yarnApplicationType;
 
         public Core.YarnApplicationType YarnApplicationType
         {
@@ -90,9 +90,10 @@ namespace YarnNinja.Common
                 var result = LogText.Split(new[] { '\r', '\n' });
                 foreach (var line in result)
                 {
-                    var logLine = new YarnApplicationLogLine();
-
-                    logLine.Msg = line;
+                    var logLine = new YarnApplicationLogLine
+                    {
+                        Msg = line
+                    };
                     this.logLines.Add(logLine);
                 }
             }
@@ -140,24 +141,14 @@ namespace YarnNinja.Common
                     };
 
                         var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
-                        switch (traceLevelstr)
+                        logLine.TraceLevel = traceLevelstr switch
                         {
-                            case "INFO":
-                                logLine.TraceLevel = TraceLevel.INFO;
-                                break;
-                            case "WARN":
-                                logLine.TraceLevel = TraceLevel.WARN;
-                                break;
-                            case "ERROR":
-                                logLine.TraceLevel = TraceLevel.ERROR;
-                                break;
-                            case "DEBUG":
-                                logLine.TraceLevel = TraceLevel.DEBUG;
-                                break;
-                            default:
-                                logLine.TraceLevel = TraceLevel.UNKNOWN;
-                                break;
-                        }
+                            "INFO" => TraceLevel.INFO,
+                            "WARN" => TraceLevel.WARN,
+                            "ERROR" => TraceLevel.ERROR,
+                            "DEBUG" => TraceLevel.DEBUG,
+                            _ => TraceLevel.UNKNOWN,
+                        };
                         this.logLines.Add(logLine);
                     }
 

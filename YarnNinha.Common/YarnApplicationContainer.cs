@@ -1,4 +1,5 @@
-﻿using YarnNinja.Common.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -10,6 +11,8 @@ namespace YarnNinja.Common
         public string Id { get; set; }
 
         private int countMappers = -1;
+
+        [ExcludeFromCodeCoverage]
         public int CountMappers
         {
             get
@@ -23,6 +26,7 @@ namespace YarnNinja.Common
                     // get all syslog lines
                     var allSyslogLine = GetLogsByBaseType(LogType.syslog);
 
+
                     var filterTasks = allSyslogLine.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function.Equals("main") && p.Equals("org.apache.hadoop.metrics2.impl.MetricsSystemImpl") && p.Msg.EndsWith("metrics system started")).ToList();
                     countMappers = filterTasks.Where(p => p.Msg.StartsWith("MapTask")).Count();
                     countReducers = filterTasks.Where(p => p.Msg.StartsWith("ReduceTask")).Count();
@@ -33,6 +37,8 @@ namespace YarnNinja.Common
         }
         
         private int countReducers = -1;
+
+        [ExcludeFromCodeCoverage]
         public int CountReducers
         {
             get
@@ -55,7 +61,7 @@ namespace YarnNinja.Common
             private set { }
         }
 
-        private YarnApplicationType yarnApplicationType = YarnApplicationType.Tez;
+        private readonly YarnApplicationType yarnApplicationType;
         public string ApplicationType { get; private set; }
 
         private DateTime start = DateTime.MinValue;
@@ -130,8 +136,9 @@ namespace YarnNinja.Common
         public string StatusCode { get; internal set; }
         public DateTime StatusTime { get; internal set; }
 
-        public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = yarnApplicationType; }
+        public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = applicationType; }
 
+        [ExcludeFromCodeCoverage]
         private YarnApplicationContainer() { }
 
         public List<YarnApplicationLogLine> GetLogsByType(string logType)
@@ -160,5 +167,6 @@ namespace YarnNinja.Common
             return allLogs;
         }
 
+        
     }
 }

@@ -63,15 +63,6 @@ namespace YarnNinja.App.WinApp.Views
             }
         }
 
-        private void ListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            
-        }
-
-        private void ListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-        }
-
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
         }

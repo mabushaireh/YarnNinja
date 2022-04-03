@@ -1,0 +1,54 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="YarnNinja.CommonTests" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="YarnNinja.Common.Tests" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="YarnApplicationTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="YarnNinja.Common.Tests.YarnApplicationTests.YarnApplicationTest_ReturnTezWorkers" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Correct Workers for Tez" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="YarnNinja.Common.Tests.YarnApplicationTests.YarnApplication_InvalidFileFormat_NotAYarnApp" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Valid Mapreduce Yarn Application" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="YarnNinja.Common.Tests.YarnApplicationTests.YarnApplication_TezOrMapReduce_ReturnYarnObject" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Valid Tez Yarn Application" />
+                        <Property Name="DisplayName" Value="Valid Mapreduce Yarn Application" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="YarnApplicationContainerTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="YarnNinja.Common.Tests.YarnApplicationContainerTests.GetLogsByTypeTest_ReturnCorrectLineCounts" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="GetLogsByTypeTest_ReturnCorrectLineCounts" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
@@ -35,16 +36,19 @@ namespace YarnNinja.Common
         public YarnApplicationHeader Header { get; set; }
         public List<YarnApplicationContainer> Containers { get; set; }
 
-        private YarnApplicationContainer? _applicationMaster = null;
-        public YarnApplicationContainer? ApplicationMaster
+        private YarnApplicationContainer _applicationMaster;
+        public YarnApplicationContainer ApplicationMaster
         {
             get
             {
                 if (_applicationMaster is null)
                 {
                     var minOrder = this.Containers.Min(p => p.Order);
-
-                    this._applicationMaster = this.Containers.Where(p => p.Order == minOrder).FirstOrDefault();
+                    var appMaster = this.Containers.Where(p => p.Order == minOrder).FirstOrDefault();
+                    if (appMaster != null)
+                        this._applicationMaster = appMaster;
+                    else
+                        throw new InvalidYarnFileFormat("Unable to find the application Master!");
                 }
                 return this._applicationMaster;
             }
@@ -70,7 +74,7 @@ namespace YarnNinja.Common
             }
         }
 
-
+        [ExcludeFromCodeCoverage]
         private YarnApplication() { }
 
 
@@ -105,7 +109,7 @@ namespace YarnNinja.Common
         private async Task ParseContainersAsync()
         {
             this.Containers = new List<YarnApplicationContainer>();
-            Regex r = new Regex(containerLogPattern, RegexOptions.Singleline);
+            Regex r = new(containerLogPattern, RegexOptions.Singleline);
 
 
 
@@ -152,7 +156,7 @@ namespace YarnNinja.Common
 
             //Get User
             var allLunchLogs = this.ApplicationMaster.GetLogsByBaseType(LogType.launch_container_sh);
-            Regex r = new Regex(userPattern, RegexOptions.Singleline);
+            Regex r = new(userPattern, RegexOptions.Singleline);
             var exportuserCommand = allLunchLogs.Where(P => P.Msg.StartsWith("export USER=")).FirstOrDefault();
 
             if (exportuserCommand is not null)
@@ -238,15 +242,11 @@ namespace YarnNinja.Common
                         Group failedDagsg = m.Groups[5];
                         Group killedDagsg = m.Groups[6];
 
-                        switch (statusg.Captures[0].Value.Trim())
+                        this.Header.Status = statusg.Captures[0].Value.Trim() switch
                         {
-                            case "SUCCEEDED":
-                                this.Header.Status = YarnApplicationStatus.SUCCEEDED;
-                                break;
-                            default:
-                                this.Header.Status = YarnApplicationStatus.UNKNOWN;
-                                break;
-                        }
+                            "SUCCEEDED" => YarnApplicationStatus.SUCCEEDED,
+                            _ => YarnApplicationStatus.UNKNOWN,
+                        };
 
                         this.Header.Msg = msgg.Captures[0].Value.Trim();
                         this.Header.SubmittedDags = int.Parse(submittedDagsg.Captures[0].Value.Trim());
