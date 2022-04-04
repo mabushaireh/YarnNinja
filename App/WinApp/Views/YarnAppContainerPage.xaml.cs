@@ -56,7 +56,7 @@ namespace YarnNinja.App.WinApp.Views
                 LogLinesDataGrid.ItemsSource = null;
                 LogLinesDataGrid.ItemsSource = ViewModel.ContainersLogTypeLines;
             }
-            else if (e.PropertyName.StartsWith("Show"))
+            else if (e.PropertyName.StartsWith("Show") || e.PropertyName == "QueryText")
             {
                 LogLinesDataGrid.ItemsSource = null;
                 LogLinesDataGrid.ItemsSource = ViewModel.ContainersLogTypeLines;
@@ -65,6 +65,7 @@ namespace YarnNinja.App.WinApp.Views
 
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
+            ViewModel.QueryText = args.QueryText;
         }
 
         private async Task CloseYarnAppContainer()

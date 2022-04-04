@@ -10,7 +10,7 @@ namespace YarnNinja.App.WinApp.ViewModels
         public YarnApplicationContainer YarnAppContainer { get; set; }
         public YarnAppContainerPageViewModel()
         {
-            
+
         }
 
         private string current;
@@ -104,10 +104,10 @@ namespace YarnNinja.App.WinApp.ViewModels
                 if (!HasCurrent)
                     return new List<YarnApplicationLogLine>();
 
-                var containersLogTypeLines = YarnAppContainer.GetLogsByType(Current);
+                var containersLogTypeLines = YarnAppContainer.GetLogsByType(Current).Where(p => p.Msg.Contains(QueryText)).ToList();
 
                 //Filter based on types
-                if (!ShowErrors) 
+                if (!ShowErrors)
                     containersLogTypeLines = containersLogTypeLines.Where(p => p.TraceLevel != TraceLevel.ERROR).ToList();
                 if (!ShowWarnings)
                     containersLogTypeLines = containersLogTypeLines.Where(p => p.TraceLevel != TraceLevel.WARN).ToList();
@@ -115,7 +115,7 @@ namespace YarnNinja.App.WinApp.ViewModels
                     containersLogTypeLines = containersLogTypeLines.Where(p => p.TraceLevel != TraceLevel.INFO).ToList();
                 if (!ShowDebug)
                     containersLogTypeLines = containersLogTypeLines.Where(p => p.TraceLevel != TraceLevel.DEBUG).ToList();
-                
+
 
 
                 return containersLogTypeLines;
@@ -124,12 +124,17 @@ namespace YarnNinja.App.WinApp.ViewModels
             set { }
         }
 
+        private string queryText = string.Empty;
+        public string QueryText { get { return queryText; } set {
+                SetProperty(ref queryText, value);
+            } }
+
         protected override void OnActivated()
         {
             base.OnActivated();
 
             // Does not see the messages with a token.
-            
+
 
         }
     }
