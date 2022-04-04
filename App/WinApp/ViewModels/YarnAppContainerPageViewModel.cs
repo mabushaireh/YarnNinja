@@ -125,9 +125,14 @@ namespace YarnNinja.App.WinApp.ViewModels
         }
 
         private string queryText = string.Empty;
-        public string QueryText { get { return queryText; } set {
+        public string QueryText
+        {
+            get { return queryText; }
+            set
+            {
                 SetProperty(ref queryText, value);
-            } }
+            }
+        }
 
         protected override void OnActivated()
         {

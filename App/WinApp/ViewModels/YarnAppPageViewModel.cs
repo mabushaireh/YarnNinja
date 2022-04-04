@@ -149,12 +149,22 @@ namespace YarnNinja.App.WinApp.ViewModels
                 if (!HasCurrent)
                     return new List<YarnApplicationContainer>();
 
-                var conainers = YarnApp.Containers.OrderBy(t => t.Order).Where(p => current.Name == "ALL" || p.WorkerNode == current.Name).ToList();
+                var conainers = YarnApp.Containers.OrderBy(t => t.Order).Where(p => (current.Name == "ALL" || p.WorkerNode == current.Name) && p.Id.Contains(QueryText)).ToList();
 
                 return conainers;
             }
 
             set { }
+        }
+
+        private string queryText = string.Empty;
+        public string QueryText
+        {
+            get { return queryText; }
+            set
+            {
+                SetProperty(ref queryText, value);
+            }
         }
     }
 }
