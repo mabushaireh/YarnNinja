@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YarnNinja.Common.Core
+namespace YarnNinja.Common
 {
 
     public enum YarnApplicationType

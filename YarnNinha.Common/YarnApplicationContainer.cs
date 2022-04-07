@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -69,10 +68,16 @@ namespace YarnNinja.Common
         {
             get
             {
+                List<YarnApplicationLogLine> allLogs;
                 if (start == DateTime.MinValue)
                 {
-                    // parse for container start time
-                    var allLogs = GetLogsByBaseType(LogType.syslog);
+                    if (yarnApplicationType == YarnApplicationType.Tez || yarnApplicationType == YarnApplicationType.MapReduce)
+                        // parse for container start time
+                        allLogs = GetLogsByBaseType(LogType.syslog);
+                    {
+                        allLogs = GetLogsByBaseType(LogType.stderr);
+                        allLogs.AddRange(GetLogsByBaseType(LogType.stdout));
+                    }
 
                     if (allLogs.Count > 0)
                     {
@@ -93,10 +98,20 @@ namespace YarnNinja.Common
         {
             get
             {
+                List<YarnApplicationLogLine> allLogs;
+
                 if (finish == DateTime.MaxValue)
                 {
-                    // parse for container start time
-                    var allLogs = GetLogsByBaseType(LogType.syslog);
+                    if (yarnApplicationType == YarnApplicationType.Tez || yarnApplicationType == YarnApplicationType.MapReduce)
+                        // parse for container start time
+                        allLogs = GetLogsByBaseType(LogType.syslog);
+                    else
+                    {
+                        allLogs = GetLogsByBaseType(LogType.stderr);
+                        allLogs.AddRange(GetLogsByBaseType(LogType.stdout));
+                    }
+                        
+
 
                     if (allLogs.Count > 0)
                     {

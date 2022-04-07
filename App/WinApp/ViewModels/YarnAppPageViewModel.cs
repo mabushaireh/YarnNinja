@@ -8,7 +8,6 @@ using YarnNinja.App.WinApp.Models;
 using YarnNinja.App.WinApp.Services;
 using YarnNinja.Common;
 using System;
-using YarnNinja.Common.Core;
 using System.Collections.Generic;
 
 namespace YarnNinja.App.WinApp.ViewModels

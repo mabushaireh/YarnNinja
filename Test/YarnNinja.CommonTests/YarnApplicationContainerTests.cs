@@ -7,10 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
-using YarnNinja.CommonTests;
-using YarnNinja.Common.Core;
 
-namespace YarnNinja.Common.Tests
+namespace YarnNinja.CommonTests
 {
     [TestClass()]
     public class YarnApplicationContainerTests : BaseCommonTest
@@ -18,7 +16,7 @@ namespace YarnNinja.Common.Tests
         private YarnApplicationContainer? _masterApp;
 
         [TestMethod()]
-        [DataRow("container-localizer-syslog", 2,DisplayName = "Correct Container Logs By Type container-localizer-syslog")]
+        [DataRow("container-localizer-syslog", 2, DisplayName = "Correct Container Logs By Type container-localizer-syslog")]
         [DataRow("dag_1639352826059_8646_1.dot", 42, DisplayName = "Correct Container Logs By Type dag_1639352826059_8646_1.dot")]
         [DataRow("dag_1639352826059_8646_2.dot", 12, DisplayName = "Correct Container Logs By Type dag_1639352826059_8646_2.dot")]
         [DataRow("dag_1639352826059_8646_3.dot", 50, DisplayName = "Correct Container Logs By dag_1639352826059_8646_3.dot")]
@@ -35,7 +33,7 @@ namespace YarnNinja.Common.Tests
         [DataRow("syslog_dag_1639352826059_8646_3", 70, DisplayName = "Correct Container Logs By syslog_dag_1639352826059_8646_3")]
         public void Tez_GetLogsByTypeTest_ReturnCorrectLineCounts(string logType, int expectedLogCount)
         {
-            
+
             _masterApp = GetActiveYarnApp(YarnApplicationType.Tez)?.ApplicationMaster;
 
             Assert.AreEqual(expected: expectedLogCount, actual: _masterApp?.GetLogsByType(logType).Count);
