@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YarnNinja.Common;
-using YarnNinja.Common.Core;
 
 namespace YarnNinja.CommonTests
 {
@@ -15,9 +14,12 @@ namespace YarnNinja.CommonTests
     {
         private const string tezLogFileName = @"./Samples/application_1639352826059_8646.log";
         private const string mapreduceLogFileName = "./Samples/application_1647350095798_0001.log";
+        private const string sparkLogFileName = "./Samples/1648899966078_0027.log";
 
         private static YarnApplication? _tezYarnApp;
         private static YarnApplication? _mapreduceYarnApp;
+        private static YarnApplication? _sparkYarnApp;
+
 
         protected static YarnApplication? GetActiveYarnApp(YarnApplicationType yarnType)
         {
@@ -34,13 +36,19 @@ namespace YarnNinja.CommonTests
                 case YarnApplicationType.MapReduce:
                     if (_mapreduceYarnApp == null)
                     {
-                        var mapredicelog = File.ReadAllText(mapreduceLogFileName);
+                        var mapreducelog = File.ReadAllText(mapreduceLogFileName);
 
-                        _mapreduceYarnApp = new(mapredicelog);
+                        _mapreduceYarnApp = new(mapreducelog);
                     }
                     return _mapreduceYarnApp;
                 case YarnApplicationType.Spark:
-                    return null;
+                    if (_sparkYarnApp == null)
+                    {
+                        var sparklog = File.ReadAllText(sparkLogFileName);
+
+                        _sparkYarnApp = new(sparklog);
+                    }
+                    return _sparkYarnApp;
                 default:
                     return null;
             }

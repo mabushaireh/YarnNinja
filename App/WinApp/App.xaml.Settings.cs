@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
+using Windows.Foundation.Collections;
 using Windows.Storage;
 using YarnNinja.App.WinApp.Models;
 
@@ -18,7 +19,7 @@ namespace YarnNinja.App.WinApp
         {
             try
             {
-                var applicationData = ApplicationData.Current.LocalSettings.Values[settingsFile];
+                IPropertySet applicationData = null; //ApplicationData.Current.LocalSettings.Values[settingsFile];
                 if (applicationData == null)
                 {
                     Settings = null;
@@ -35,7 +36,7 @@ namespace YarnNinja.App.WinApp
             {
                 // Unable to read the settings (e.g. broken xml)
                 Settings = null;
-                ApplicationData.Current.LocalSettings.Values.Remove(settingsFile);
+                //ApplicationData.Current.LocalSettings.Values.Remove(settingsFile);
             }
 
             if (Settings == null)
@@ -62,7 +63,7 @@ namespace YarnNinja.App.WinApp
                 var stringWriter = new StringWriter();
                 serializer.Serialize(stringWriter, Settings);
                 var applicationData = stringWriter.ToString();
-                ApplicationData.Current.LocalSettings.Values[settingsFile] = applicationData;
+                //ApplicationData.Current.LocalSettings.Values[settingsFile] = applicationData;
             }
             catch (Exception)
             {

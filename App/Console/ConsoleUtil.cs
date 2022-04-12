@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YarnNinja.Common.Core;
+using YarnNinja.Common;
 
 namespace YarnNinja.App.Console
 {
