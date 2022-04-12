@@ -74,8 +74,8 @@ namespace YarnNinja.CommonTests
             "application_1648899966078_0027",
             "2022-04-04 11:37:27,000",
             "2022-04-04 11:49:50,000",
-            4,
-            "hive",
+            31,
+            "spark",
             "default",
             YarnApplicationStatus.SUCCEEDED,
             DisplayName = "Correct Header for Spark")]

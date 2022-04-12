@@ -74,6 +74,7 @@ namespace YarnNinja.Common
                     if (yarnApplicationType == YarnApplicationType.Tez || yarnApplicationType == YarnApplicationType.MapReduce)
                         // parse for container start time
                         allLogs = GetLogsByBaseType(LogType.syslog);
+                    else
                     {
                         allLogs = GetLogsByBaseType(LogType.stderr);
                         allLogs.AddRange(GetLogsByBaseType(LogType.stdout));
