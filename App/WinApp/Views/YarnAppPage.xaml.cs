@@ -28,12 +28,19 @@ namespace YarnNinja.App.WinApp.Views
             if (e.Parameter != null) {
                 this.YarnApp = e.Parameter as YarnApplication;
 
-                (ViewModel as YarnAppPageViewModel).YarnApp = this.YarnApp;
+                ViewModel.YarnApp = this.YarnApp;
             }
             ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
-            
+            if (!ViewModel.HasCurrent && ViewModel.WorkerNodes.Count > 0)
+            {
+                ViewModel.Current = ViewModel.WorkerNodes[0];
+                WorkersListView.ScrollIntoView(ViewModel.Current);
+            }
+
+
+
             base.OnNavigatedTo(e);
         }
 
@@ -54,9 +61,14 @@ namespace YarnNinja.App.WinApp.Views
             if (e.PropertyName == "Current" && ViewModel.HasCurrent)
             {
                 WorkersListView.ScrollIntoView(ViewModel.Current);
+                WorkersListView.SelectedItem = ViewModel.Current;
                 ContainersDataGrid.ItemsSource = null;
                 ContainersDataGrid.ItemsSource = ViewModel.Containers;
-
+            }
+            else if (e.PropertyName == "QueryText")
+            {
+                ContainersDataGrid.ItemsSource = null;
+                ContainersDataGrid.ItemsSource = ViewModel.Containers;
 
             }
         }
@@ -74,6 +86,7 @@ namespace YarnNinja.App.WinApp.Views
 
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
+            ViewModel.QueryText = args.QueryText;
         }
 
         private async Task CloseYarnApp()

@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -19,6 +18,9 @@ namespace YarnNinja.Common
     {
         internal const string yarnLogLineTezPattern = "(?<TimeStamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (?:\\[(?<TraceLevel>.*)\\]|(?<TraceLevel>.*)) \\[(?<Function>.*)\\] \\|?(?<Module>.*?)\\|?:";
         internal const string yarnLogLineTezSplitPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} (?:\\[.*\\]|.*) \\[.*\\] \\|?.*?\\|?:)";
+
+        internal const string yarnLogLineSparkPattern = "(?<TimeStamp>\\d{2}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}) (?<TraceLevel>.*) (?<Module>.*) \\[(?<Function>.*)]:";
+        internal const string yarnLogLineSparkSplitPattern = @"(\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} .* .* \[.*]:)";
 
         internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
         internal const string yarnLogLineMapredSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\w* \\[.*\\] .*?: ";
@@ -76,7 +78,7 @@ namespace YarnNinja.Common
 
         private readonly YarnApplicationType yarnApplicationType;
 
-        public Core.YarnApplicationType YarnApplicationType
+        public YarnApplicationType YarnApplicationType
         {
             get { return this.yarnApplicationType; }
             private set { }
@@ -85,77 +87,116 @@ namespace YarnNinja.Common
 
         private async Task ParseLogsAsync()
         {
-            if (this.BaseLogType != LogType.syslog)
+            Regex r = null;
+            Regex l = null;
+            string timestampForamt = "";
+
+            if (this.yarnApplicationType != YarnApplicationType.Spark)
             {
-                var result = LogText.Split(new[] { '\r', '\n' });
-                foreach (var line in result)
+                if (this.BaseLogType != LogType.syslog)
                 {
-                    var logLine = new YarnApplicationLogLine
+                    var result = LogText.Split(new[] { '\r', '\n' });
+                    foreach (var line in result)
                     {
-                        Msg = line
-                    };
-                    this.logLines.Add(logLine);
+                        var logLine = new YarnApplicationLogLine
+                        {
+                            Msg = line
+                        };
+                        this.logLines.Add(logLine);
+                    }
+                    return;
+                }
+                else
+                {
+
+                    if (this.YarnApplicationType == YarnApplicationType.Tez)
+                    {
+                        
+                        r = new Regex(yarnLogLineTezPattern, RegexOptions.Singleline);
+                        l = new Regex(yarnLogLineTezSplitPattern, RegexOptions.None);
+                        timestampForamt = "yyyy-MM-dd HH:mm:ss,fff";
+                    }
+
+                    else if (this.YarnApplicationType == YarnApplicationType.MapReduce)
+                    {
+                        r = new Regex(yarnLogLineMapredPattern, RegexOptions.None);
+                        l = new Regex(yarnLogLineMapredSplitPattern, RegexOptions.None);
+                        timestampForamt = "yyyy-MM-dd HH:mm:ss,fff";
+                    }
                 }
             }
             else
             {
-                Regex r = null;
-                Regex l = null;
-                if (this.YarnApplicationType == Core.YarnApplicationType.Tez)
+                if (this.BaseLogType != LogType.stdout && this.BaseLogType != LogType.stderr)
                 {
-                    r = new Regex(yarnLogLineTezPattern, RegexOptions.Singleline);
-                    l = new Regex(yarnLogLineTezSplitPattern, RegexOptions.None);
-                }
-
-                else if (this.YarnApplicationType == Core.YarnApplicationType.MapReduce)
-                {
-                    r = new Regex(yarnLogLineMapredPattern, RegexOptions.None);
-                    l = new Regex(yarnLogLineMapredSplitPattern, RegexOptions.None);
-                }
-                else
-                    throw new Exception("Spark Logs is not implemeneted yet!");
-
-                //FIXME: added new line at the end to make split works
-                var txt = LogText + Environment.NewLine;
-
-                var lines = l.Split(txt);
-                //Remove empty lines
-                lines = lines.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-                for (int i =0; i < lines.Length; i += 2)
-                {
-
-                    Match m = r.Match(lines[i]);
-                    if (m.Success)
+                    var result = LogText.Split(new[] { '\r', '\n' });
+                    foreach (var line in result)
                     {
-                        Group timestampg = m.Groups["TimeStamp"];
-                        Group traceLevelg = m.Groups["TraceLevel"];
-                        Group functiong = m.Groups["Function"];
-                        Group moduleg = m.Groups["Module"];
-
                         var logLine = new YarnApplicationLogLine
                         {
-                            Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss,fff", null),
-                            Function = functiong.Captures[0].Value.Trim(),
-                            Module = moduleg.Captures[0].Value.Trim(),
-                            Msg = lines[i + 1].Trim()
-                    };
-
-                        var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
-                        logLine.TraceLevel = traceLevelstr switch
-                        {
-                            "INFO" => TraceLevel.INFO,
-                            "WARN" => TraceLevel.WARN,
-                            "ERROR" => TraceLevel.ERROR,
-                            "DEBUG" => TraceLevel.DEBUG,
-                            _ => TraceLevel.UNKNOWN,
+                            Msg = line
                         };
                         this.logLines.Add(logLine);
                     }
-
+                    return;
+                }
+                else
+                {
+                    r = new Regex(yarnLogLineSparkPattern, RegexOptions.Singleline);
+                    l = new Regex(yarnLogLineSparkSplitPattern, RegexOptions.None);
+                    timestampForamt = "yy/MM/dd HH:mm:ss";
                 }
             }
 
+
+            //FIXME: added new line at the end to make split works
+            var txt = LogText + Environment.NewLine;
+
+            var lines = l.Split(txt);
+            //Remove empty lines
+            lines = lines.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+            
+
+            for (int i = 0; i < lines.Length;)
+            {
+
+                Match m = r.Match(lines[i]);
+                if (m.Success)
+                {
+                    Group timestampg = m.Groups["TimeStamp"];
+                    Group traceLevelg = m.Groups["TraceLevel"];
+                    Group functiong = m.Groups["Function"];
+                    Group moduleg = m.Groups["Module"];
+
+                    var logLine = new YarnApplicationLogLine
+                    {
+                        Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), timestampForamt, null),
+                        Function = functiong.Captures[0].Value.Trim(),
+                        Module = moduleg.Captures[0].Value.Trim(),
+                        Msg = lines[i + 1].Trim()
+                    };
+
+                    var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
+                    logLine.TraceLevel = traceLevelstr switch
+                    {
+                        "INFO" => TraceLevel.INFO,
+                        "WARN" => TraceLevel.WARN,
+                        "ERROR" => TraceLevel.ERROR,
+                        "DEBUG" => TraceLevel.DEBUG,
+                        _ => TraceLevel.UNKNOWN,
+                    };
+                    this.logLines.Add(logLine);
+                    i += 2;
+                }
+                else 
+                {
+                    //remove first lines dosest start with datatime stamp
+                    i++;
+                }
+
+            }
         }
+
 
         private YarnApplicationContainerLog() { }
 
