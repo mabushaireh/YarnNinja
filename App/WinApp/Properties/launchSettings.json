@@ -1,18 +1,19 @@
 {
   "profiles": {
-    "WinApp (Package)": {
-      "commandName": "MsixPackage"
-    },
     "WinApp (Unpackaged)": {
       "commandName": "Project"
     },
     "Debug with Tez-Success": {
-      "commandName": "MsixPackage",
+      "commandName": "Project",
       "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647265892795_0006.log\""
     },
     "Debug with mapred-Success": {
-      "commandName": "MsixPackage",
+      "commandName": "Project",
       "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647350095798_0001.log\""
+    },
+    "Debug with Spark": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\1648899966078_0027.log\""
     }
   }
 }

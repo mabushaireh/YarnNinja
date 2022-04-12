@@ -2,8 +2,6 @@
 
 using Terminal.Gui;
 using NStack;
-
-using YarnNinja.Common.Core;
 using System.Data;
 using YarnNinja.Common.Utils;
 using YarnNinja.Common;

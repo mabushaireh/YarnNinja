@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Linq;
 using YarnNinja.Common;
-using YarnNinja.Common.Core;
 using YarnNinja.Common.Utils;
 
 namespace YarnNinja.CommonTests
@@ -15,6 +14,7 @@ namespace YarnNinja.CommonTests
         [TestMethod()]
         [DataRow(YarnApplicationType.Tez, DisplayName = "Valid Tez Yarn Application")]
         [DataRow(YarnApplicationType.MapReduce, DisplayName = "Valid Mapreduce Yarn Application")]
+        [DataRow(YarnApplicationType.Spark, DisplayName = "Valid Spark Yarn Application")]
         public void YarnApplication_TezOrMapReduce_ReturnYarnObject(YarnApplicationType expectedAppType)
         {
 
@@ -51,11 +51,14 @@ namespace YarnNinja.CommonTests
 
 
         [TestMethod()]
-        [DataRow(YarnApplicationType.Tez, DisplayName = "Correct Workers for Tez")]
-        public void YarnApplicationTest_ReturnTezWorkers(YarnApplicationType appType)
+        [DataRow(YarnApplicationType.Tez, 10, DisplayName = "Correct Workers for Tez")]
+        [DataRow(YarnApplicationType.Spark, 3, DisplayName = "Correct Workers for Spark")]
+        public void YarnApplicationTest_ReturnWorkers(YarnApplicationType appType, int expectedWorkers)
         {
-            Assert.IsTrue(GetActiveYarnApp(appType)?.WorkerNodes?.Count == 10);
+            Assert.IsTrue(GetActiveYarnApp(appType)?.WorkerNodes?.Count == expectedWorkers);
         }
+
+        
 
         [TestMethod()]
         [DataRow(YarnApplicationType.Tez,
@@ -67,6 +70,15 @@ namespace YarnNinja.CommonTests
             "default",
             YarnApplicationStatus.SUCCEEDED,
             DisplayName = "Correct Header for Tez")]
+        [DataRow(YarnApplicationType.Spark,
+            "application_1648899966078_0027",
+            "2022-04-04 11:37:27,000",
+            "2022-04-04 11:49:50,000",
+            31,
+            "spark",
+            "default",
+            YarnApplicationStatus.SUCCEEDED,
+            DisplayName = "Correct Header for Spark")]
         public void YarnApplicationTest_ReturnCorrectHeaderInfo(YarnApplicationType appType,
             string appId,
             string start,
@@ -89,6 +101,7 @@ namespace YarnNinja.CommonTests
             Assert.AreEqual(expected: user, actual: GetActiveYarnApp(appType)?.Header.User, "User Count is not correct!");
             Assert.AreEqual(expected: queue, actual: GetActiveYarnApp(appType)?.Header.QueueName, "QueueName Count is not correct!");
         }
+
 
 
         [TestMethod()]

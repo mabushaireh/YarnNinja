@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using YarnNinja.Common.Core;
 
 namespace YarnNinja.Common
 {
@@ -94,11 +93,17 @@ namespace YarnNinja.Common
             }
 
             var isTez = yarnLog.Contains("./tezlib");
+            var isSpark = false;
             var isMapred = false;
-            if (!isTez)
-                isMapred = yarnLog.Contains("./mr-framework");
 
-            Header.Type = (isTez ? Core.YarnApplicationType.Tez : (isMapred ? Core.YarnApplicationType.MapReduce : throw new InvalidYarnFileFormat("Not Support Yarn App Format!")));
+            if (!isTez)
+                isSpark = yarnLog.Contains("__spark_conf__");
+
+            if (!isTez && !isSpark)
+                isMapred = yarnLog.Contains("./mr-framework");
+            
+
+            Header.Type = (isTez ? YarnApplicationType.Tez : (isMapred ? YarnApplicationType.MapReduce : (isSpark ? YarnApplicationType.Spark : throw new InvalidYarnFileFormat("Not Support Yarn App Format!"))));
 
 
             ParseContainersAsync().Wait();
@@ -177,7 +182,7 @@ namespace YarnNinja.Common
 
 
             // Get Queue Name
-            if (this.Header.Type == Core.YarnApplicationType.Tez)
+            if (this.Header.Type == YarnApplicationType.Tez)
             {
                 var dagSubmitted = allSysLogs.Where(p =>
                                     p.Function.StartsWith("IPC Server handler") &&
@@ -198,7 +203,7 @@ namespace YarnNinja.Common
                     }
                 }
             }
-            else if (this.Header.Type == Core.YarnApplicationType.MapReduce)
+            else if (this.Header.Type == YarnApplicationType.MapReduce)
             {
                 var rmCommunicator = allSysLogs.Where(p =>
                                     p.Function.Equals("main") &&

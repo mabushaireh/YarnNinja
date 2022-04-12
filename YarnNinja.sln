@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YarnNinja.App.Console", "Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EA18273F-57B4-4D5A-B98C-7DAE02F54382}"
 	ProjectSection(SolutionItems) = preProject
+		Samples\1648899966078_0027.log = Samples\1648899966078_0027.log
 		Samples\application_1639352826059_8646.log = Samples\application_1639352826059_8646.log
 		Samples\application_1647350095798_0001.log = Samples\application_1647350095798_0001.log
 		Samples\FakeFile.log = Samples\FakeFile.log
