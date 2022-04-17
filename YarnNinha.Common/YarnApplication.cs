@@ -225,6 +225,12 @@ namespace YarnNinja.Common
                 }
 
             }
+            else
+            {
+                // FIXME: not sure yet how to get the queue name from the log. couldnt find it yet
+                this.Header.QueueName = "NA";
+
+            }
 
             if (Header.Type == YarnApplicationType.Tez)
             {

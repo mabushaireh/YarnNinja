@@ -76,7 +76,7 @@ namespace YarnNinja.CommonTests
             "2022-04-04 11:49:50,000",
             31,
             "spark",
-            "default",
+            "NA",
             YarnApplicationStatus.SUCCEEDED,
             DisplayName = "Correct Header for Spark")]
         public void YarnApplicationTest_ReturnCorrectHeaderInfo(YarnApplicationType appType,
