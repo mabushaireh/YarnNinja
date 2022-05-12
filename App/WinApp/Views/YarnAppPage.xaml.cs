@@ -87,7 +87,7 @@ namespace YarnNinja.App.WinApp.Views
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             //ViewModel.QueryText = args.QueryText;
-      }
+        }
 
         private async Task CloseYarnApp()
         {
