@@ -24,6 +24,10 @@ The vision for this tool is:
 4.	You can contribute as a Release Manager
 5.	You can contribute as a beta tester and sharing feedback
 
+### How to install:
+1. Download and extract the latest release
+2. Install Windows App SDK 1.1 Preview 3: https://aka.ms/windowsappsdk/1.1/1.1.0-preview3/windowsappruntimeinstall-1.1.0-preview3-x64.exe
+3. Run : YarnNinja.App.WinApp.exe from the folder you extracted
 
 ### Credits:
 Yarn Ninja logo is designed by @Nuno Nunes. Thank you, Nuno, for the nice and creative Logo.
