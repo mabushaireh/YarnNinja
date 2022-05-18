@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using YarnNinja.App.WinApp.Models;
 using YarnNinja.App.WinApp.ViewModels;
 using YarnNinja.Common;
 
@@ -25,7 +26,8 @@ namespace YarnNinja.App.WinApp.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter != null) {
+            if (e.Parameter != null)
+            {
                 this.YarnApp = e.Parameter as YarnApplication;
 
                 ViewModel.YarnApp = this.YarnApp;
@@ -33,11 +35,13 @@ namespace YarnNinja.App.WinApp.Views
             ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
-            if (!ViewModel.HasCurrent && ViewModel.WorkerNodes.Count > 0)
+            if (!ViewModel.HasCurrentWorkerNode && ViewModel.WorkerNodes.Count > 0)
             {
-                ViewModel.Current = ViewModel.WorkerNodes[0];
-                WorkersListView.ScrollIntoView(ViewModel.Current);
+                ViewModel.CurrentWorkerNode = "ALL";
             }
+            WorkersListView.ScrollIntoView(ViewModel.CurrentWorkerNode);
+            ContainersDataGrid.ItemsSource = null;
+            ContainersDataGrid.ItemsSource = ViewModel.Containers;
 
 
 
@@ -58,18 +62,14 @@ namespace YarnNinja.App.WinApp.Views
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Current" && ViewModel.HasCurrent)
+            if ((e.PropertyName == "CurrentWorkerNode" && ViewModel.HasCurrentWorkerNode) || e.PropertyName == "QueryText") 
             {
-                WorkersListView.ScrollIntoView(ViewModel.Current);
-                WorkersListView.SelectedItem = ViewModel.Current;
-                ContainersDataGrid.ItemsSource = null;
+                if (ContainersDataGrid.ItemsSource != null)
+                {
+                    ContainersDataGrid.ItemsSource = null;
+                }
                 ContainersDataGrid.ItemsSource = ViewModel.Containers;
-            }
-            else if (e.PropertyName == "QueryText")
-            {
-                ContainersDataGrid.ItemsSource = null;
-                ContainersDataGrid.ItemsSource = ViewModel.Containers;
-
+                ContainersDataGrid.SelectedItem = (ViewModel.Containers.Count > 0? ViewModel.Containers[0] : null);
             }
         }
 
@@ -86,7 +86,7 @@ namespace YarnNinja.App.WinApp.Views
 
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            ViewModel.QueryText = args.QueryText;
+            //ViewModel.QueryText = args.QueryText;
         }
 
         private async Task CloseYarnApp()
@@ -105,9 +105,11 @@ namespace YarnNinja.App.WinApp.Views
             }
 
             var dgrid = sender as DataGrid;
-           
+
 
             var selectedContainer = dgrid.SelectedItem as YarnApplicationContainer;
+            ViewModel.CurrentContainer = selectedContainer;
+            
             ((Application.Current as App).Navigation as Shell).AddContainer(YarnApp, selectedContainer);
         }
     }

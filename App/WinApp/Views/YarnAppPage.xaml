@@ -40,7 +40,9 @@
                             QueryIcon="Find"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
-                            Margin="8 0" />
+                            Margin="8 0" 
+                            Text="{x:Bind ViewModel.QueryText, Mode=TwoWay}"
+                            />
 
             <CommandBar Background="Transparent"
                         DefaultLabelPosition="Right"
@@ -135,10 +137,10 @@
 
         <ListView x:Name="WorkersListView"
                   ItemsSource="{x:Bind ViewModel.WorkerNodes, Mode=OneWay}"
-                  SelectedItem="{x:Bind ViewModel.Current, Mode=TwoWay}"
+                  SelectedItem="{x:Bind ViewModel.CurrentWorkerNode, Mode=TwoWay}"
                   Grid.Row="2" Grid.Column="0" Header="Workers">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:WorkerNode">
+            <!--<ListView.ItemTemplate>
+                <DataTemplate>
                     <UserControl PointerEntered="ListViewItem_PointerEntered"
                                  PointerExited="ListViewItem_PointerExited">
                         <RelativePanel Background="Transparent">
@@ -152,11 +154,11 @@
                         </RelativePanel>
                     </UserControl>
                 </DataTemplate>
-            </ListView.ItemTemplate>
+            </ListView.ItemTemplate>-->
         </ListView>
         <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
                           ItemsSource="{x:Bind ViewModel.Containers, Mode=OneWay}"
-                          SelectedItem="{x:Bind ViewModel.CurrentContainer, Mode=TwoWay}"   
+                          SelectedItem="{x:Bind ViewModel.CurrentContainer, Mode=TwoWay}"
                           x:Name="ContainersDataGrid" Height="Auto" Width="Auto" 
                           Margin="12" AutoGenerateColumns="False" IsReadOnly="True" 
                                   HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >

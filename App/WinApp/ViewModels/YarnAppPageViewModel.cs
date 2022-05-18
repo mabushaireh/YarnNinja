@@ -14,17 +14,20 @@ namespace YarnNinja.App.WinApp.ViewModels
 {
     public partial class YarnAppPageViewModel : ObservableRecipient
     {
-        private WorkerNode current;
+        private string current;
 
         public YarnApplication YarnApp { get; set; }
         public YarnAppPageViewModel()
         {
-            
+
         }
 
-        public string YarnType { get { 
+        public string YarnType
+        {
+            get
+            {
                 return YarnApp.Header.Type.ToString();
-            } 
+            }
         }
 
         public string Start
@@ -98,12 +101,12 @@ namespace YarnNinja.App.WinApp.ViewModels
             }
         }
 
-        public List<WorkerNode> WorkerNodes
+        public List<string> WorkerNodes
         {
             get
             {
-                var workers = YarnApp.WorkerNodes.OrderBy(t => t).ToList().Select( p => new WorkerNode() { Name=p}).ToList();
-                workers.Insert(0, new WorkerNode { Name = "ALL" });
+                var workers = YarnApp.WorkerNodes.OrderBy(t => t).ToList();
+                workers.Insert(0, "ALL");
                 return workers;
             }
         }
@@ -113,31 +116,82 @@ namespace YarnNinja.App.WinApp.ViewModels
             base.OnActivated();
 
             // Does not see the messages with a token.
-            
+
 
         }
 
-        public bool HasCurrent => current is not null;
-
-        public WorkerNode Current
+        public bool HasCurrentWorkerNode
         {
-            get => current;
-            set
+            get
             {
-                SetProperty(ref current, value);
-                OnPropertyChanged(nameof(HasCurrent));
+                try
+                {
+                    return !string.IsNullOrEmpty(AppState.GetStateFor(StatePurpose.SelectedWorkerNode, this.YarnApp.Header.Id));
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
-        private YarnApplicationContainer currentContainer;
-        public bool HasCurrentContainer => currentContainer is not null;
+        public string CurrentWorkerNode
+        {
+            get => AppState.GetStateFor(StatePurpose.SelectedWorkerNode, this.YarnApp.Header.Id);
+            set
+            {
+                try
+                {
+                    if (value == CurrentWorkerNode)
+                        return;
+                }
+                catch { }
+                
+
+                AppState.SetStateFor(StatePurpose.SelectedWorkerNode, value, this.YarnApp.Header.Id);
+                OnPropertyChanged(nameof(CurrentWorkerNode));
+                OnPropertyChanged(nameof(HasCurrentWorkerNode));
+            }
+        }
+
+        public bool HasCurrentContainer
+        {
+            get
+            {
+                try
+                {
+                    return !string.IsNullOrEmpty(AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id));
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
         public YarnApplicationContainer CurrentContainer
         {
-            get => currentContainer;
+            get
+            {
+                try
+                {
+                    var containerId = AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id);
+
+                    return YarnApp.Containers.Where(p => p.Id == containerId).FirstOrDefault();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
             set
             {
-                SetProperty(ref currentContainer, value);
+                if (value == null)
+                    return;
+
+                AppState.SetStateFor(StatePurpose.SelectedContainer, value.Id, this.YarnApp.Header.Id);
+                OnPropertyChanged(nameof(CurrentContainer));
                 OnPropertyChanged(nameof(HasCurrentContainer));
             }
         }
@@ -145,10 +199,10 @@ namespace YarnNinja.App.WinApp.ViewModels
         {
             get
             {
-                if (!HasCurrent)
+                if (!HasCurrentWorkerNode)
                     return new List<YarnApplicationContainer>();
 
-                var conainers = YarnApp.Containers.OrderBy(t => t.Order).Where(p => (current.Name == "ALL" || p.WorkerNode == current.Name) && p.Id.Contains(QueryText)).ToList();
+                var conainers = YarnApp.Containers.OrderBy(t => t.Order).Where(p => (CurrentWorkerNode == "ALL" || p.WorkerNode == CurrentWorkerNode) && p.Id.Contains(QueryText)).ToList();
 
                 return conainers;
             }
@@ -156,13 +210,25 @@ namespace YarnNinja.App.WinApp.ViewModels
             set { }
         }
 
-        private string queryText = string.Empty;
         public string QueryText
         {
-            get { return queryText; }
+            get
+            {
+                try
+                {
+                    return AppState.GetStateFor(StatePurpose.QueryText, this.YarnApp.Header.Id);
+
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
             set
             {
-                SetProperty(ref queryText, value);
+                AppState.SetStateFor(StatePurpose.QueryText, value, this.YarnApp.Header.Id);
+
+                OnPropertyChanged(nameof(QueryText));
             }
         }
     }
