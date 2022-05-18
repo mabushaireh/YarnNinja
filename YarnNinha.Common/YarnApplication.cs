@@ -20,8 +20,20 @@ namespace YarnNinja.Common
         DEBUG,
         UNKNOWN
     }
+
+    public class ContainerProccessedArgs
+    {
+        public ContainerProccessedArgs(string containerId, int totalContainerLogs, int currentContainerLogsCount) 
+        { ContainerId = containerId; TotalContainerLogs = totalContainerLogs; CurrentContainerLogsCount = currentContainerLogsCount; }
+        public string ContainerId { get; } // readonly
+        public int TotalContainerLogs { get;  }
+        public int CurrentContainerLogsCount { get; }
+    }
+
     public class YarnApplication
     {
+        
+
         internal const string applicationIdPattern = "application_\\d+_\\d{4,}";
         internal const string containerLogPattern = "Container: (.*?) on (.*?)LogAggregationType:.*?LogContents:(.*?)End of LogType:(.*?)[\\*]+";
         const string applicationExsitStausTezPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
@@ -29,6 +41,11 @@ namespace YarnNinja.Common
         const string userPattern = "export USER=\"(.*?)\"";
         const string queueNameTezPattern = ".*queueName=(.*)";
         const string queueNameMapredPattern = ".*queue: (.*)";
+
+        public delegate void ContainerProccessedHandler(object sender, ContainerProccessedArgs e);
+        public event ContainerProccessedHandler ContainerProccessed;
+        private int totalContainerLogs = 0;
+        private int currentContainerLogsCount = 0;
 
 
         public string YarnLog { get; }
@@ -106,21 +123,24 @@ namespace YarnNinja.Common
             Header.Type = (isTez ? YarnApplicationType.Tez : (isMapred ? YarnApplicationType.MapReduce : (isSpark ? YarnApplicationType.Spark : throw new InvalidYarnFileFormat("Not Support Yarn App Format!"))));
 
 
-            ParseContainersAsync().Wait();
+           // ParseContainersAsync().Wait();
 
         }
 
 
-        private async Task ParseContainersAsync()
+        public async Task ParseContainersAsync()
         {
             this.Containers = new List<YarnApplicationContainer>();
             Regex r = new(containerLogPattern, RegexOptions.Singleline);
 
-
+            //Estimate the number of containers logs
+            //FIXME: find a better way to estimate number of containers, without proccesing all the file with regex
+            totalContainerLogs = (int) (this.YarnLog.Length / 15000);
 
             Match m = r.Match(this.YarnLog);
             while (m.Success)
             {
+                ++currentContainerLogsCount;
                 Group containerId = m.Groups[1];
                 Group workernode = m.Groups[2];
 
@@ -147,7 +167,10 @@ namespace YarnNinja.Common
 
 
                 m = m.NextMatch();
+                this.ContainerProccessed?.Invoke(this, new ContainerProccessedArgs(id, totalContainerLogs, currentContainerLogsCount));
             }
+            this.ContainerProccessed?.Invoke(this, new ContainerProccessedArgs("", currentContainerLogsCount, currentContainerLogsCount));
+
 
             if (this.ApplicationMaster is not null)
                 await ParseHeaderInfoAsync();

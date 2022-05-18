@@ -146,7 +146,7 @@ namespace YarnNinja.App.WinApp.ViewModels
                         return;
                 }
                 catch { }
-                
+
 
                 AppState.SetStateFor(StatePurpose.SelectedWorkerNode, value, this.YarnApp.Header.Id);
                 OnPropertyChanged(nameof(CurrentWorkerNode));
@@ -158,14 +158,8 @@ namespace YarnNinja.App.WinApp.ViewModels
         {
             get
             {
-                try
-                {
-                    return !string.IsNullOrEmpty(AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id));
-                }
-                catch
-                {
-                    return false;
-                }
+                var containerId = AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id);
+                return !string.IsNullOrEmpty(containerId);
             }
         }
 
@@ -173,16 +167,9 @@ namespace YarnNinja.App.WinApp.ViewModels
         {
             get
             {
-                try
-                {
-                    var containerId = AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id);
+                var containerId = AppState.GetStateFor(StatePurpose.SelectedContainer, this.YarnApp.Header.Id);
 
-                    return YarnApp.Containers.Where(p => p.Id == containerId).FirstOrDefault();
-                }
-                catch
-                {
-                    return null;
-                }
+                return (containerId != "" ? YarnApp.Containers.Where(p => p.Id == containerId).FirstOrDefault() : null);
             }
 
             set
@@ -214,15 +201,7 @@ namespace YarnNinja.App.WinApp.ViewModels
         {
             get
             {
-                try
-                {
-                    return AppState.GetStateFor(StatePurpose.QueryText, this.YarnApp.Header.Id);
-
-                }
-                catch
-                {
-                    return string.Empty;
-                }
+                return AppState.GetStateFor(StatePurpose.QueryText, this.YarnApp.Header.Id);
             }
             set
             {

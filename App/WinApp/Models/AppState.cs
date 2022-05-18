@@ -41,7 +41,10 @@ namespace YarnNinja.App.WinApp.Models
 
         public static string GetStateFor(StatePurpose stateFor, params string[] list) 
         {
-            return cached_state[GenerateKey(stateFor, list)];
+            if (cached_state.ContainsKey(GenerateKey(stateFor, list)))
+                return cached_state[GenerateKey(stateFor, list)];
+            else
+                return "";
         }
 
         public static void SetStateFor(StatePurpose stateFor, string state, params string[] list)

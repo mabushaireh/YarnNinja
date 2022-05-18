@@ -30,6 +30,7 @@ namespace YarnNinja.CommonTests
                     {
                         var tezlog = File.ReadAllText(tezLogFileName);
                         _tezYarnApp = new (tezlog);
+                        _tezYarnApp.ParseContainersAsync();
 
                     }
                     return _tezYarnApp;
@@ -39,6 +40,7 @@ namespace YarnNinja.CommonTests
                         var mapreducelog = File.ReadAllText(mapreduceLogFileName);
 
                         _mapreduceYarnApp = new(mapreducelog);
+                        _mapreduceYarnApp.ParseContainersAsync();
                     }
                     return _mapreduceYarnApp;
                 case YarnApplicationType.Spark:

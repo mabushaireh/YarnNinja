@@ -36,6 +36,7 @@ namespace YarnNinja.CommonTests
 
                 var log = File.ReadAllText(@"./Samples/" + fileName);
                 _yarnApp = new YarnApplication(log);
+                _yarnApp.ParseContainersAsync();
 
                 Assert.Fail(); // If it gets to this line, no exception was thrown
             }

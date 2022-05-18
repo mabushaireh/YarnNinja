@@ -280,10 +280,24 @@ namespace YarnNinja.App.Console
         private static async Task OpenAsync(string initialText)
         {
             app = new YarnApplication(initialText);
+            app.ContainerProccessed += App_ContainerProccessed;
+            app.ParseContainersAsync();
 
             await RefreshYarnAppInfo();
         }
 
+        private static void App_ContainerProccessed(object sender, ContainerProccessedArgs e)
+        {
+            // calculate progress 
+            var progress = (double)e.CurrentContainerLogsCount / (double)e.TotalContainerLogs;
+            // Convert to %
+            progress = progress * 100;
+            // prorate to 80%
+            // this 80% of the progress, calcualte the overall progress assuming it already progressed 10%
+            progress = progress * 80 / 100;
+            progress += 10;
+            bgWorker.ReportProgress((int)progress);
+        }
 
         private static async Task<FrameView> BuildHeaderAsync()
         {

@@ -175,8 +175,11 @@ namespace YarnNinja.App.WinApp
         {
             var file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
             var logText = FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
-            this.bgWorker.ReportProgress(25);
-            var yarnApp = new Common.YarnApplication(logText);
+            this.bgWorker.ReportProgress(10);
+            var yarnApp = new YarnApplication(logText);
+            yarnApp.ContainerProccessed += YarnApp_ContainerProccessed;
+            yarnApp.ParseContainersAsync();
+
             if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Any())
             {
                 this.bgWorker.ReportProgress(100);
@@ -186,7 +189,19 @@ namespace YarnNinja.App.WinApp
             }
 
             this.yarnApps.Add(yarnApp);
-            this.bgWorker.ReportProgress(50);
+        }
+
+        private void YarnApp_ContainerProccessed(object sender, ContainerProccessedArgs e)
+        {
+            // calculate progress 
+            var progress = (double)e.CurrentContainerLogsCount/ (double)e.TotalContainerLogs;
+            // Convert to %
+            progress = progress * 100;
+            // prorate to 80%
+            // this 80% of the progress, calcualte the overall progress assuming it already progressed 10%
+            progress = progress * 80 / 100;
+            progress += 10;
+            this.bgWorker.ReportProgress((int)progress);
         }
 
         private void ApplyTheme()
