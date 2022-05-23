@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
+using YarnNinja.App.WinApp.Models;
 using YarnNinja.Common;
 
 namespace YarnNinja.App.WinApp.ViewModels
@@ -13,68 +14,141 @@ namespace YarnNinja.App.WinApp.ViewModels
 
         }
 
-        private string current;
-        public bool HasCurrent => current is not null;
+        public bool HasCurrent
+        {
+            get
+            {
+                try
+                {
+                    return !string.IsNullOrEmpty(AppState.GetStateFor(StatePurpose.SelectedLogType, this.YarnAppContainer.Id));
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
         public string Current
         {
-            get => current;
+            get => AppState.GetStateFor(StatePurpose.SelectedLogType, this.YarnAppContainer.Id);
             set
             {
-                SetProperty(ref current, value);
+                try
+                {
+                    if (value == Current)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.SelectedLogType, value, this.YarnAppContainer.Id);
+
+                OnPropertyChanged(nameof(Current));
                 OnPropertyChanged(nameof(HasCurrent));
             }
         }
 
-        private bool showErrors = true;
         public bool ShowErrors
         {
-            get => showErrors;
+            get
+            {
+                var isShowError = AppState.GetStateFor(StatePurpose.IsShowError, this.YarnAppContainer.Id);
+                if (string.IsNullOrEmpty(isShowError))
+                    return true;
+                else
+                    return bool.Parse(isShowError);
+            }
             set
             {
-                SetProperty(ref showErrors, value);
+                try
+                {
+                    if (value == ShowErrors)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.IsShowError, value.ToString(), this.YarnAppContainer.Id);
+                OnPropertyChanged(nameof(ShowErrors));
             }
         }
 
-        private bool showWarnings = true;
         public bool ShowWarnings
         {
-            get => showWarnings;
+            get
+            {
+                var isShowWarnings = AppState.GetStateFor(StatePurpose.IsShowWarnings, this.YarnAppContainer.Id);
+                if (string.IsNullOrEmpty(isShowWarnings))
+                    return true;
+                else
+                    return bool.Parse(isShowWarnings);
+            }
             set
             {
-                SetProperty(ref showWarnings, value);
+                try
+                {
+                    if (value == ShowWarnings)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.IsShowWarnings, value.ToString(), this.YarnAppContainer.Id);
+                OnPropertyChanged(nameof(ShowWarnings));
             }
         }
 
-        private bool showInfo = true;
         public bool ShowInfo
         {
-            get => showInfo;
+            get
+            {
+                var isShowInfo = AppState.GetStateFor(StatePurpose.IsShowInfo, this.YarnAppContainer.Id);
+                if (string.IsNullOrEmpty(isShowInfo))
+                    return true;
+                else
+                    return bool.Parse(isShowInfo);
+            }
             set
             {
-                SetProperty(ref showInfo, value);
+                try
+                {
+                    if (value == ShowInfo)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.IsShowInfo, value.ToString(), this.YarnAppContainer.Id);
+                OnPropertyChanged(nameof(ShowInfo));
             }
         }
 
-        private bool showDebug = true;
         public bool ShowDebug
         {
-            get => showDebug;
+            get
+            {
+                var isShowDebug = AppState.GetStateFor(StatePurpose.IsShowDebug, this.YarnAppContainer.Id);
+                if (string.IsNullOrEmpty(isShowDebug))
+                    return true;
+                else
+                    return bool.Parse(isShowDebug);
+            }
             set
             {
-                SetProperty(ref showDebug, value);
+                try
+                {
+                    if (value == ShowInfo)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.IsShowDebug, value.ToString(), this.YarnAppContainer.Id);
+                OnPropertyChanged(nameof(ShowDebug));
             }
         }
 
-        private bool showVerbos = true;
-        public bool ShowVerbose
-        {
-            get => showVerbos;
-            set
-            {
-                SetProperty(ref showVerbos, value);
-            }
-        }
 
         public List<string> LogTypes
         {
@@ -124,23 +198,28 @@ namespace YarnNinja.App.WinApp.ViewModels
             set { }
         }
 
-        private string queryText = string.Empty;
         public string QueryText
         {
-            get { return queryText; }
+            get => AppState.GetStateFor(StatePurpose.QueryText, this.YarnAppContainer.Id);
             set
             {
-                SetProperty(ref queryText, value);
+                try
+                {
+                    if (value == QueryText)
+                        return;
+                }
+                catch { }
+
+
+                AppState.SetStateFor(StatePurpose.QueryText, value, this.YarnAppContainer.Id);
+
+                OnPropertyChanged(nameof(QueryText));
             }
         }
 
         protected override void OnActivated()
         {
             base.OnActivated();
-
-            // Does not see the messages with a token.
-
-
         }
     }
 }

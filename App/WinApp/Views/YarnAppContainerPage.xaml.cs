@@ -33,7 +33,11 @@ namespace YarnNinja.App.WinApp.Views
             ViewModel.IsActive = true;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
-            
+            if (!ViewModel.HasCurrent && ViewModel.LogTypes.Count > 0)
+            {
+                ViewModel.Current = ViewModel.LogTypes[0];
+            }
+
             base.OnNavigatedTo(e);
         }
 

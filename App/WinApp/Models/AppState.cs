@@ -15,7 +15,7 @@ namespace YarnNinja.App.WinApp.Models
         SelectedLogType = 2,
         SelectedLogLine = 3,
         IsShowError = 4,
-        IsShowWarning = 5,
+        IsShowWarnings = 5,
         IsShowInfo = 6,
         IsShowDebug = 7,
         QueryText = 8
