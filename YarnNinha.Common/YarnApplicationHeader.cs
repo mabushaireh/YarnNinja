@@ -9,6 +9,7 @@ namespace YarnNinja.Common
     public class YarnApplicationHeader
     {
         public string Id { get; set; }
+        
         public YarnApplicationType Type { get; set; }
         public YarnApplicationStatus Status { get; set; }
         public DateTime Start { get; set; }

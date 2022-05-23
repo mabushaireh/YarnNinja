@@ -47,6 +47,13 @@ namespace YarnNinja.Common
         private int totalContainerLogs = 0;
         private int currentContainerLogsCount = 0;
 
+        public string ShortId
+        {
+            get
+            {
+                return Header.Id.Substring(Header.Id.Length - 4);
+            }
+        }
 
         public string YarnLog { get; }
         public YarnApplicationHeader Header { get; set; }

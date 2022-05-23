@@ -22,14 +22,14 @@ namespace YarnNinja.App.WinApp
 
             if (args.SelectedItemContainer is null) return;
 
-            if ((args.SelectedItemContainer as NavigationViewItem).Content.ToString().StartsWith("container"))
+            if (!(args.SelectedItemContainer as NavigationViewItem).Content.ToString().StartsWith("application"))
             {
                 NavigationViewItem parentMenuItem = GetParentMenuItem((args.SelectedItemContainer as NavigationViewItem).Content.ToString());
 
                 var yarnAppId = parentMenuItem.Content.ToString();
 
                 var yarnApp = this.yarnApps.Where(p => p.Header.Id == yarnAppId).FirstOrDefault();
-                obj = yarnApp.Containers.Where(p => p.Id == (args.SelectedItemContainer as NavigationViewItem).Content.ToString()).FirstOrDefault();
+                obj = yarnApp.Containers.Where(p => p.Id.EndsWith((args.SelectedItemContainer as NavigationViewItem).Content.ToString())).FirstOrDefault();
             }
             else
             {
