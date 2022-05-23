@@ -8,7 +8,18 @@ namespace YarnNinja.Common
         
 
         public string Id { get; set; }
+        public string ShortId
+        {
+            get
+            {
+                return GetContainerShortId(Id);
+            }
+        }
 
+        public string GetContainerShortId(string id)
+        {
+            return id.Substring(Id.Length - 20);
+        }
         private int countMappers = -1;
 
         [ExcludeFromCodeCoverage]

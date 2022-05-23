@@ -121,7 +121,7 @@ namespace YarnNinja.App.WinApp
 
         internal void CloseYarnAppContainer(YarnAppContainerPage yarnAppContainerPage)
         {
-            var yarnAppContainerName = yarnAppContainerPage.YarnAppContainer.Id;
+            var yarnAppContainerName = yarnAppContainerPage.YarnAppContainer.ShortId;
 
             var menuItems = GetNavigationViewItems();
             var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppContainerName).FirstOrDefault();
@@ -142,19 +142,20 @@ namespace YarnNinja.App.WinApp
             var parent = GetNavigationViewItems().Where(p => p.Content.ToString() == yarnApp.Header.Id).FirstOrDefault();
 
             // Check if contianer already open then switch only
-            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == container.Id).FirstOrDefault();
+            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == container.ShortId).FirstOrDefault();
 
             if (navItem == null)
             {
                 navItem = new()
                 {
-                    Content = container.Id,
+                    Content = container.ShortId,
+                    
                     Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage"
                 };
 
                 navItem.Tapped += (sender, e) =>
                 {
-                    ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
+                    ToolTipService.SetToolTip(sender as NavigationViewItem, container.Id);
                 };
 
                 navItem.Icon = new BitmapIcon()
