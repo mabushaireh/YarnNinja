@@ -36,6 +36,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <AutoSuggestBox QuerySubmitted="SearchBox_QuerySubmitted"
+                      Text="{x:Bind ViewModel.QueryText, Mode=TwoWay}"
                       QueryIcon="Find"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
