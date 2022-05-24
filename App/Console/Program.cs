@@ -296,7 +296,7 @@ namespace YarnNinja.App.Console
             // this 80% of the progress, calcualte the overall progress assuming it already progressed 10%
             progress = progress * 80 / 100;
             progress += 10;
-            bgWorker.ReportProgress((int)progress);
+            //bgWorker.ReportProgress((int)progress);
         }
 
         private static async Task<FrameView> BuildHeaderAsync()

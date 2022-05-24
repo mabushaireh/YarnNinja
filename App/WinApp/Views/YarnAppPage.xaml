@@ -5,11 +5,13 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:models="using:YarnNinja.App.WinApp.Models"
       xmlns:viewmodels="using:YarnNinja.App.WinApp.ViewModels"
-      xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls" xmlns:views="using:YarnNinja.App.WinApp.Views"
       mc:Ignorable="d"
       Background="Transparent">
 
     <Page.Resources>
+        <views:ApplicationMasterConverter x:Key="ApplicationMasterConverter" Containers="{x:Bind ViewModel.Containers, Mode=OneWay}">
+        </views:ApplicationMasterConverter>
     </Page.Resources>
     <Page.DataContext>
         <viewmodels:YarnAppPageViewModel x:Name="ViewModel" />
@@ -139,22 +141,6 @@
                   ItemsSource="{x:Bind ViewModel.WorkerNodes, Mode=OneWay}"
                   SelectedItem="{x:Bind ViewModel.CurrentWorkerNode, Mode=TwoWay}"
                   Grid.Row="2" Grid.Column="0" Header="Workers">
-            <!--<ListView.ItemTemplate>
-                <DataTemplate>
-                    <UserControl PointerEntered="ListViewItem_PointerEntered"
-                                 PointerExited="ListViewItem_PointerExited">
-                        <RelativePanel Background="Transparent">
-
-                            <TextBlock RelativePanel.AlignLeftWithPanel="True"
-                                       RelativePanel.AlignVerticalCenterWithPanel="True"
-                                       Margin="0 0" ToolTipService.ToolTip="{x:Bind Name, Mode=OneWay}">
-                                <Run Text="{x:Bind Name, Mode=OneWay}"
-                                     FontWeight="SemiBold" />
-                            </TextBlock>
-                        </RelativePanel>
-                    </UserControl>
-                </DataTemplate>
-            </ListView.ItemTemplate>-->
         </ListView>
         <ctWinUI:DataGrid Grid.Column="1" Grid.Row="2" CanUserSortColumns="True"
                           ItemsSource="{x:Bind ViewModel.Containers, Mode=OneWay}"
@@ -162,11 +148,15 @@
                           x:Name="ContainersDataGrid" Height="Auto" Width="Auto" 
                           Margin="12" AutoGenerateColumns="False" IsReadOnly="True" 
                                   HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >
+            
             <ctWinUI:DataGrid.Columns>
                 <ctWinUI:DataGridTextColumn 
                                 Header="Container Name" 
-                                Binding="{Binding Id}" 
-                                FontSize="12" />
+                                FontSize="12">
+                    <ctWinUI:DataGridTextColumn.Binding>
+                        <Binding Path="Id" Converter="{StaticResource ApplicationMasterConverter}"></Binding>
+                    </ctWinUI:DataGridTextColumn.Binding>
+                </ctWinUI:DataGridTextColumn>
                 <ctWinUI:DataGridTextColumn 
                                 Header="Start" 
                                 Binding="{Binding Start}" 
