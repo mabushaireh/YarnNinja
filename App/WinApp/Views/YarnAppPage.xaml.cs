@@ -11,6 +11,7 @@ using YarnNinja.App.WinApp.Models;
 using YarnNinja.App.WinApp.ViewModels;
 using YarnNinja.Common;
 
+
 namespace YarnNinja.App.WinApp.Views
 {
     public sealed partial class YarnAppPage : Page
