@@ -21,6 +21,7 @@ namespace YarnNinja.App.WinApp
             Object obj;
 
             if (args.SelectedItemContainer is null) return;
+            if ((args.SelectedItemContainer as NavigationViewItem).Content.ToString().Equals("About")) return;
 
             if (!(args.SelectedItemContainer as NavigationViewItem).Content.ToString().StartsWith("application"))
             {

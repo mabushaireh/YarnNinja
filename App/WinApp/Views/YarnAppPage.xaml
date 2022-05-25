@@ -10,7 +10,7 @@
       Background="Transparent">
 
     <Page.Resources>
-        <views:ApplicationMasterConverter x:Key="ApplicationMasterConverter" Containers="{x:Bind ViewModel.Containers, Mode=OneWay}">
+        <views:ApplicationMasterConverter x:Key="ApplicationMasterConverter" AppMaster="{x:Bind ViewModel.YarnApp.ApplicationMaster, Mode=OneWay}">
         </views:ApplicationMasterConverter>
     </Page.Resources>
     <Page.DataContext>
