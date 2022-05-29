@@ -49,6 +49,7 @@ namespace YarnNinja.CommonTests
                         var sparklog = File.ReadAllText(sparkLogFileName);
 
                         _sparkYarnApp = new(sparklog);
+                        _sparkYarnApp.ParseContainersAsync();
                     }
                     return _sparkYarnApp;
                 default:
