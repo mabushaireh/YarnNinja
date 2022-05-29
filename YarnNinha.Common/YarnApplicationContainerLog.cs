@@ -31,23 +31,24 @@ namespace YarnNinja.Common
         {
             get
             {
+                // Handle senario when log type name has something like this: directory.info.This log file belongs to a running container (container_e03_1653473347542_0049_01_000001) and so may not be complete.
                 switch (YarnLogType)
                 {
-                    case "container-localizer-syslog":
+                    case string s when s.StartsWith("container-localizer-syslog"):
                         return LogType.syslog;
-                    case "directory.info":
+                    case string s when s.StartsWith("directory.info"):
                         return LogType.directory_info;
-                    case "launch_container.sh":
+                    case string s when s.StartsWith("launch_container.sh"):
                         return LogType.launch_container_sh;
-                    case "prelaunch.err":
+                    case string s when s.StartsWith("prelaunch.err"):
                         return LogType.prelaunch_err;
-                    case "prelaunch.out":
+                    case string s when s.StartsWith("prelaunch.out"):
                         return LogType.prelaunch_out;
-                    case "stderr":
+                    case string s when s.StartsWith("stderr"):
                         return LogType.stderr;
-                    case "stdout":
+                    case string s when s.StartsWith("stdout"):
                         return LogType.stdout;
-                    case "syslog":
+                    case string s when s.StartsWith("syslog"):
                         return LogType.syslog;
                     default:
                         if (YarnLogType.StartsWith("dag_"))
