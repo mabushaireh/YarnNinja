@@ -90,6 +90,13 @@ namespace YarnNinja.App.WinApp
 
                 mainStatusBar.Message = "Yarn App is loading: 100%";
 
+                if (this.yarnApps.Count < 1)
+                {
+                    mainStatusBar.Severity = InfoBarSeverity.Error;
+
+                    mainStatusBar.Message = "Yarn App failed to load";
+                }
+
                 NavigationViewItem navItem = new()
                 {
                     Content = this.yarnApps[^1].Header.Id,

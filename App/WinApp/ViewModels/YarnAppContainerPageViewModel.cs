@@ -1,6 +1,9 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using YarnNinja.App.WinApp.Models;
 using YarnNinja.Common;
 
@@ -8,6 +11,18 @@ namespace YarnNinja.App.WinApp.ViewModels
 {
     public partial class YarnAppContainerPageViewModel : ObservableRecipient
     {
+        public ICommand CopyCommand => new AsyncRelayCommand(CopyLogLine);
+        public ICommand BookmarkCommand => new AsyncRelayCommand(BookmarkLogLine);
+
+        private async Task CopyLogLine()
+        {
+
+        }
+
+        private async Task BookmarkLogLine()
+        {
+        }
+
         public YarnApplicationContainer YarnAppContainer { get; set; }
         public YarnAppContainerPageViewModel()
         {
