@@ -5,11 +5,14 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:models="using:YarnNinja.App.WinApp.Models"
       xmlns:viewmodels="using:YarnNinja.App.WinApp.ViewModels"
-      xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:local="using:YarnNinja.App.WinApp.Views"
+xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:fa="http://schemas.fontawesome.io/icons/" 
       mc:Ignorable="d"
       Background="Transparent">
 
     <Page.Resources>
+            <viewmodels:YarnAppContainerPageViewModel x:Key="vm"/>
     </Page.Resources>
     <Page.DataContext>
         <viewmodels:YarnAppContainerPageViewModel x:Name="ViewModel" />
@@ -42,7 +45,7 @@
                       VerticalAlignment="Center"
                       Margin="8 0" Grid.Column="0"/>
 
-            
+
             <CommandBar Background="Transparent" DataContext=""
                   DefaultLabelPosition="Right"
                   Grid.Column="1" Padding="12">
@@ -92,8 +95,42 @@
                           ItemsSource="{x:Bind ViewModel.ContainersLogTypeLines, Mode=OneWay}"
                           SelectedItem="{x:Bind ViewModel.CurrentContainerLogLine, Mode=TwoWay}"
                       x:Name="LogLinesDataGrid" Height="Auto" Width="Auto"
-                      Margin="12" AutoGenerateColumns="True" IsReadOnly="True"
-                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   >
+                      Margin="12" IsReadOnly="True" AllowFocusOnInteraction="True"
+                              HorizontalScrollBarVisibility="Auto" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   
+                          KeyUp="LogLinesDataGrid_KeyUp">
+            <ctWinUI:DataGrid.Columns>
+                <ctWinUI:DataGridTextColumn Header="Timestamp" Width="SizeToCells" Binding="{Binding Timestamp}"/>
+                <ctWinUI:DataGridTextColumn Header="TraceLevel" Width="SizeToCells" Binding="{Binding TraceLevel}"/>
+                <ctWinUI:DataGridTextColumn Header="Function" Width="200" Binding="{Binding Function}"/>
+                <ctWinUI:DataGridTextColumn Header="Module" Width="200" Binding="{Binding Module}"/>
+                <ctWinUI:DataGridTextColumn Header="Message"  Width="400" Binding="{Binding Msg}">
+                    <ctWinUI:DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                        </Style>
+                    </ctWinUI:DataGridTextColumn.ElementStyle>
+                </ctWinUI:DataGridTextColumn>
+                <ctWinUI:DataGridTemplateColumn Header="Actions">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <CommandBar Background="Transparent" DataContext="{StaticResource vm}" DefaultLabelPosition="Right">
+                                    <AppBarButton  Command="{Binding CopyCommand, Mode=OneWay}" Icon="Copy"/>
+                                    <AppBarToggleButton Command="{Binding BookmarkCommand, Mode=OneWay}" Icon="Flag"/>
+                                </CommandBar>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
+            </ctWinUI:DataGrid.Columns>
+            <ctWinUI:DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Msg}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ctWinUI:DataGrid.RowDetailsTemplate>
         </ctWinUI:DataGrid>
     </Grid>
 </Page>

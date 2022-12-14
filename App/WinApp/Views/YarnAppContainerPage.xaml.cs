@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -49,6 +49,7 @@ namespace YarnNinja.App.WinApp.Views
         }
 
         public ICommand CloseCommand => new AsyncRelayCommand(CloseYarnAppContainer);
+       
 
 
 
@@ -82,6 +83,11 @@ namespace YarnNinja.App.WinApp.Views
         private void ContainersDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
            
+        }
+
+        private void LogLinesDataGrid_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+
         }
     }
 }

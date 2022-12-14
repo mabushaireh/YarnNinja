@@ -1,14 +1,10 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Messaging; // Hosts the 'Register' extension method without token
-using Microsoft.Toolkit.Mvvm.Input;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows.Input;
 using YarnNinja.App.WinApp.Models;
-using YarnNinja.App.WinApp.Services;
 using YarnNinja.Common;
 using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace YarnNinja.App.WinApp.ViewModels
 {

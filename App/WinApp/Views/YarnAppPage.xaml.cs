@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

@@ -18,7 +18,8 @@ namespace YarnNinja.Common
 
         public string GetContainerShortId(string id)
         {
-            return id.Substring(Id.Length - 20);
+
+            return id.Replace("container_", "");
         }
         private int countMappers = -1;
 
@@ -193,7 +194,5 @@ namespace YarnNinja.Common
 
             return allLogs;
         }
-
-        
     }
 }

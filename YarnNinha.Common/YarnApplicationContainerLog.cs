@@ -23,7 +23,7 @@ namespace YarnNinja.Common
         internal const string yarnLogLineSparkSplitPattern = @"(\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} .* .* \[.*]:)";
 
         internal const string yarnLogLineMapredPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}) (\\w*) \\[(.*)\\] (.*?): (.*)";
-        internal const string yarnLogLineMapredSplitPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\w* \\[.*\\] .*?: ";
+        internal const string yarnLogLineMapredSplitPattern = "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3} \\w* \\[.*\\] .*?: )";
 
         private List<YarnApplicationLogLine> logLines;
         public string YarnLogType { get; set; }
