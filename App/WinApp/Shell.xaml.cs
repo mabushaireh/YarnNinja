@@ -4,11 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI.Core;
 using YarnNinja.App.WinApp.Views;
 using YarnNinja.Common;
 using YarnNinja.Common.Utils;
@@ -17,10 +14,13 @@ namespace YarnNinja.App.WinApp
 {
     public sealed partial class Shell : Window
     {
+        #region "Private Fields"
         private readonly List<YarnApplication> yarnApps = new();
-        readonly BackgroundWorker bgWorker = new();
-        DoWorkEventHandler handler;
+        private readonly BackgroundWorker bgWorker = new();
+        private DoWorkEventHandler handler;
         private int cuurentContainerCount = 0;
+        #endregion
+
 
         public Shell()
         {
@@ -33,6 +33,8 @@ namespace YarnNinja.App.WinApp
             ApplyTheme();
         }
 
+
+        #region "Event Handlers"
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
             var settings = (Application.Current as App).Settings;
@@ -45,26 +47,6 @@ namespace YarnNinja.App.WinApp
         {
             SelectYarnFromFile();
         }
-
-        private async Task SelectYarnFromFile()
-        {
-            var openFileDialog = new FileOpenPicker()
-            {
-                SuggestedStartLocation = PickerLocationId.Desktop
-            };
-
-            openFileDialog.FileTypeFilter.Add(".log");
-
-            WinRT.Interop.InitializeWithWindow.Initialize(openFileDialog, App.WindowHandle);
-
-            var file = await openFileDialog.PickSingleFileAsync();
-            if (file != null)
-                OpenYarnAppFile(file.Path);
-
-        }
-
-
-
 
         private void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -88,26 +70,8 @@ namespace YarnNinja.App.WinApp
                 mainStatusBar.Message = $"Yarn App is loading: 100%, Containers: ({cuurentContainerCount})";
 
 
-                NavigationViewItem navItem = new()
-                {
-                    Content = this.yarnApps[^1].Header.Id,
-                    Tag = "YarnNinja.App.WinApp.Views.YarnAppPage"
-                };
-                navItem.Tapped += (sender, e) =>
-                {
-                    ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
-                };
+                AddMenuItem(null, this.yarnApps[^1].Header.Id);
 
-
-                navItem.Icon = new BitmapIcon()
-                {
-                    UriSource = new Uri("ms-appx:///Assets/App.png"),
-                    ShowAsMonochrome = false
-                };
-
-                AddMenuItem(NavigationView, (navItem));
-
-                SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
             }
             else
             {
@@ -116,22 +80,36 @@ namespace YarnNinja.App.WinApp
                 mainStatusBar.IsOpen = true;
             }
         }
+        private void File_ProgressEventHandler(object sender, EventArgs e)
+        {
+            this.bgWorker.ReportProgress((int)(sender as YarnLogFileReader).ProgressPrecent);
+        }
+        #endregion
 
+
+        private async Task SelectYarnFromFile()
+        {
+            var openFileDialog = new FileOpenPicker()
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop
+            };
+
+            openFileDialog.FileTypeFilter.Add(".log");
+
+            WinRT.Interop.InitializeWithWindow.Initialize(openFileDialog, App.WindowHandle);
+
+            var file = await openFileDialog.PickSingleFileAsync();
+            if (file != null)
+                OpenYarnAppFile(file.Path);
+
+        }
+
+     
         internal void CloseYarnAppContainer(YarnAppContainerPage yarnAppContainerPage)
         {
             var yarnAppContainerName = yarnAppContainerPage.YarnAppContainer.ShortId;
 
-            var menuItems = GetNavigationViewItems();
-            var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppContainerName).FirstOrDefault();
-
-
-            var parent = GetParentMenuItem(yarnAppContainerName);
-            parent.MenuItems.Remove(menuItem);
-            menuItem = null;
-
-            var yarnApp = this.yarnApps.Where(p => p.Header.Id == parent.Content.ToString()).FirstOrDefault();
-
-            SetCurrentNavigationViewItem(parent, yarnApp);
+            RemoveMenuItem(yarnAppContainerPage.YarnAppContainer.YarnApplication.Header.Id, yarnAppContainerPage.YarnAppContainer.ShortId);
         }
 
         internal void AddContainer(YarnApplication yarnApp, YarnApplicationContainer container)
@@ -140,53 +118,11 @@ namespace YarnNinja.App.WinApp
             var parent = GetNavigationViewItems().Where(p => p.Content.ToString() == yarnApp.Header.Id).FirstOrDefault();
 
             // Check if contianer already open then switch only
-            NavigationViewItem navItem = parent.MenuItems.Select(i => (NavigationViewItem)i).Where(p => p.Content.ToString() == container.ShortId).FirstOrDefault();
-
-            if (navItem == null)
-            {
-                navItem = new()
-                {
-                    Content = container.ShortId,
-
-                    Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage"
-                };
-
-                navItem.Tapped += (sender, e) =>
-                {
-                    ToolTipService.SetToolTip(sender as NavigationViewItem, container.Id);
-                };
-
-                navItem.Icon = new BitmapIcon()
-                {
-                    UriSource = new Uri("ms-appx:///Assets/Container.png"),
-                    ShowAsMonochrome = false
-                };
-
-                AddMenuItem(parent, navItem);
-            }
-
-            SetCurrentNavigationViewItem(navItem, container);
-        }
-
-        private async Task OpenYarnAppLogFileAsync(string path)
-        {
            
-            var file = new YarnLogFileReader();
-            file.OpenFile(path);
+            AddMenuItem(yarnApp.Header.Id, container.ShortId);
+    }
 
-            this.bgWorker.ReportProgress((int)file.ProgressPrecent);
-            var yarnApp = new YarnApplication(file);
-            this.yarnApps.Add(yarnApp);
-            file.ProgressEventHandler += File_ProgressEventHandler;
-            yarnApp.ContainerAddedEvent += YarnApp_ContainerAddedEvent;
-
-            await yarnApp.ParseContainersAsync();
-
-            if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Count() > 1)
-            {
-                this.yarnApps.Remove(yarnApp); 
-            }
-        }
+       
 
         private void YarnApp_ContainerAddedEvent(object sender, ContainerAddedEventArgs e)
         {
@@ -195,17 +131,13 @@ namespace YarnNinja.App.WinApp
 
         }
 
-        private void File_ProgressEventHandler(object sender, EventArgs e)
-        {
-            this.bgWorker.ReportProgress((int)(sender as YarnLogFileReader).ProgressPrecent);
-        }
-
-
         private void ApplyTheme()
         {
             var settings = (Application.Current as App).Settings;
             Root.RequestedTheme = settings.IsLightTheme ? ElementTheme.Light : ElementTheme.Dark;
         }
+
+
 
         public void OpenYarnAppFile(string path)
         {
@@ -221,6 +153,26 @@ namespace YarnNinja.App.WinApp
             bgWorker.RunWorkerAsync();
         }
 
+        private async Task OpenYarnAppLogFileAsync(string path)
+        {
+            var file = new YarnLogFileReader();
+            file.OpenFile(path);
+
+            this.bgWorker.ReportProgress((int)file.ProgressPrecent);
+            var yarnApp = new YarnApplication(file);
+            this.yarnApps.Add(yarnApp);
+            file.ProgressEventHandler += File_ProgressEventHandler;
+            yarnApp.ContainerAddedEvent += YarnApp_ContainerAddedEvent;
+
+            await yarnApp.ParseContainersAsync();
+
+            if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Count() > 1)
+            {
+                this.yarnApps.Remove(yarnApp);
+            }
+            file.CloseFile();
+        }
+
         public void CloseYarnApp(YarnAppPage yarnAppPage)
         {
             var yarnAppName = yarnAppPage.YarnApp.Header.Id;
@@ -228,22 +180,7 @@ namespace YarnNinja.App.WinApp
             this.yarnApps.Remove(yarnApp);
             yarnApp = null;
 
-
-            var menuItems = GetNavigationViewItems();
-            var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppName).FirstOrDefault();
-            NavigationView.MenuItems.Remove(menuItem);
-            menuItem = null;
-            if (this.yarnApps.Count > 0)
-            {
-                var select = menuItems.Where(p => p.Content.ToString() == this.yarnApps[^1].Header.Id).FirstOrDefault();
-
-                SetCurrentNavigationViewItem(select, this.yarnApps[^1]);
-            }
-            else
-            {
-                var select = menuItems.Where(p => p.Content.ToString() == "About").FirstOrDefault();
-                SetCurrentNavigationViewItem(select, null);
-            }
+            RemoveMenuItem("", yarnAppName);
         }
     }
 }

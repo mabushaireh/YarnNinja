@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using YarnNinja.App.WinApp.Services;
 using YarnNinja.App.WinApp.Views;
@@ -17,7 +18,7 @@ namespace YarnNinja.App.WinApp
 
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            
+
             Object obj;
 
             if (args.SelectedItemContainer is null) return;
@@ -53,11 +54,11 @@ namespace YarnNinja.App.WinApp
             throw new Exception("Failed to get Parent menu item!");
         }
 
-        public List<NavigationViewItem> GetNavigationViewItems()
+        private List<NavigationViewItem> GetNavigationViewItems()
         {
             List<NavigationViewItem> result = new();
-            var items = NavigationView.MenuItems.Select(i => (NavigationViewItem)i).ToList();
-            items.AddRange(NavigationView.FooterMenuItems.Select(i => (NavigationViewItem)i));
+            var items = NavigationView.MenuItems.Select(p => (NavigationViewItem)p).ToList();
+            result.AddRange(NavigationView.FooterMenuItems.Select(p => (NavigationViewItem)p).ToList());
             result.AddRange(items);
 
             foreach (NavigationViewItem mainItem in items)
@@ -68,17 +69,12 @@ namespace YarnNinja.App.WinApp
             return result;
         }
 
-        public List<NavigationViewItem> GetNavigationViewItems(Type type)
+        private List<NavigationViewItem> GetNavigationViewItems(Type type)
         {
             return GetNavigationViewItems().Where(i => i.Tag.ToString() == type.FullName).ToList();
         }
 
-        public List<NavigationViewItem> GetNavigationViewItems(Type type, string title)
-        {
-            return GetNavigationViewItems(type).Where(ni => ni.Content.ToString() == title).ToList();
-        }
-
-        public void SetCurrentNavigationViewItem(NavigationViewItem item, object obj)
+        private void SetCurrentNavigationViewItem(NavigationViewItem item, object obj)
         {
 
             if (item == null)
@@ -94,44 +90,119 @@ namespace YarnNinja.App.WinApp
 
             ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), obj);
             NavigationView.Header = item.Content;
-            NavigationView.SelectedItem = item;
+            //NavigationView.SelectedItem = item;
         }
 
-        public NavigationViewItem GetCurrentNavigationViewItem()
+        private NavigationViewItem GetCurrentNavigationViewItem()
         {
             return NavigationView.SelectedItem as NavigationViewItem;
         }
 
-        public void SetCurrentPage(Type type, object obj)
+        private void SetCurrentPage(Type type, object obj)
         {
             ContentFrame.Navigate(type, obj);
         }
 
-
-        public NavigationViewItem AddMenuItem(object parent, NavigationViewItem child)
+        private List<NavigationViewItem> GetNavigationViewItems(Type type, string title)
         {
-            if (parent is NavigationViewItem)
+            return GetNavigationViewItems(type).Where(ni => ni.Content.ToString() == title).ToList();
+        }
+
+        public void AddMenuItem(string parent, string child)
+        {
+
+
+
+            if (!string.IsNullOrEmpty(parent))
             {
-                var childExist = (parent as NavigationViewItem).MenuItems.Where(p => (p as NavigationViewItem).Content == child.Content).FirstOrDefault();
 
-                if (childExist is not null)
-                    return (childExist as NavigationViewItem);
+                NavigationViewItem navItem = new()
+                {
+                    Content = child,
 
-                (parent as NavigationViewItem).MenuItems.Add(child);
+                    Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage"
+                };
+
+                //navItem.Tapped += (sender, e) =>
+                //{
+                //    //ToolTipService.SetToolTip(sender as NavigationViewItem, child);
+                //};
+
+                //navItem.Icon = new BitmapIcon()
+                //{
+                //    UriSource = new Uri("ms-appx:///Assets/Container.png"),
+                //    ShowAsMonochrome = false
+                //};
+                var parentMenuItem = GetNavigationViewItems().Where(p => p.Content.ToString() == parent).FirstOrDefault();
+
+                // Check if contianer already open then switch only
+                parentMenuItem.MenuItems.Add(navItem);
+                parentMenuItem.IsExpanded = true;
+                var container = this.yarnApps.Where(p => p.Header.Id.Equals(parent)).FirstOrDefault().Containers.Where(p => p.ShortId.Equals(child)).FirstOrDefault();
+                SetCurrentNavigationViewItem(navItem, container);
+
             }
             else
             {
-                var childExist = (parent as NavigationView).MenuItems.Where(p => (p as NavigationViewItem).Content == child.Content).FirstOrDefault();
+                NavigationViewItem navItem = new()
+                {
+                    Content = child,
+                    Tag = "YarnNinja.App.WinApp.Views.YarnAppPage"
+                };
+                navItem.Tapped += (sender, e) =>
+                {
+                    //ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
+                };
 
-                if (childExist is not null)
-                    return (childExist as NavigationViewItem);
 
-                (parent as NavigationView).MenuItems.Add(child);
+                navItem.Icon = new BitmapIcon()
+                {
+                    UriSource = new Uri("ms-appx:///Assets/App.png"),
+                    ShowAsMonochrome = false
+                };
+                ;
+
+                NavigationView.MenuItems.Add(navItem);
+                SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
             }
-            return child;
+
+
+            return;
 
 
         }
 
+        public void RemoveMenuItem(string parent, string child)
+        {
+            if (string.IsNullOrEmpty(parent))
+            {
+                var menuItems = GetNavigationViewItems();
+                var menuItem = menuItems.Where(p => p.Content.ToString() == child).FirstOrDefault();
+                NavigationView.MenuItems.Remove(menuItem);
+                menuItem = null;
+
+
+
+                var select = GetNavigationViewItems().Last();
+
+                if (this.yarnApps.Count > 0)
+                    SetCurrentNavigationViewItem(select, this.yarnApps[^1]);
+                else
+                    SetCurrentNavigationViewItem(select, null);
+
+            }
+            else
+            {
+                var menuItems = GetNavigationViewItems();
+                var parentMenuItem = menuItems.Where(p => p.Content.ToString() == parent).FirstOrDefault();
+                var childMenuItem = parentMenuItem.MenuItems.Select(p => (NavigationViewItem)p).Where(p => p.Content == child).FirstOrDefault();
+
+                parentMenuItem.MenuItems.Remove(childMenuItem);
+                childMenuItem = null;
+                SetCurrentNavigationViewItem(parentMenuItem, this.yarnApps.Where(p => p.Header.Id == parent).FirstOrDefault());
+
+
+            }
+        }
     }
 }

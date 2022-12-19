@@ -10,7 +10,7 @@ namespace YarnNinja.Common.Utils
 {
     public class YarnLogFileReader
     {
-        private System.IO.StreamReader sr;
+        private StreamReader sr;
         private long proccessedBytes = 0;
         private long totalBytes = 0;
         public event EventHandler ProgressEventHandler;
@@ -63,6 +63,12 @@ namespace YarnNinja.Common.Utils
         public double ProgressPrecent
         {
             get { return (this.EndOfFile? 100 : (((double)proccessedBytes)/ (double)totalBytes) * 100); }
+        }
+
+        public void CloseFile()
+        {
+            this.sr.Close();
+            this.sr.Dispose();
         }
 
         private int getLineByeteCount(string line)

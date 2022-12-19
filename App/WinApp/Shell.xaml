@@ -29,6 +29,7 @@
                         Margin="0">
 
             <NavigationView.MenuItems>
+
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem Content="About"
@@ -45,28 +46,17 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-
                 <Frame x:Name="ContentFrame"
                    Padding="10" Grid.Row="0">
-                    <!--<Frame.ContentTransitions>
-                    <TransitionCollection>
-                        <NavigationThemeTransition>
-                            <NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                                <DrillInNavigationTransitionInfo />
-                            </NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                        </NavigationThemeTransition>
-                    </TransitionCollection>
-                </Frame.ContentTransitions>-->
                 </Frame>
-                <muxc:InfoBar Name="mainStatusBar"
-    IsOpen="False"
-    Severity="Informational"
-    Title="Yarn Ninja"
-    Message="Essential app message for your users to be informed of, acknowledge, or take action on." Grid.Row="1"/>
+                <muxc:InfoBar Name="mainStatusBar" 
+                              IsOpen="False"
+                              Severity="Informational"
+                              Title="Yarn Ninja"
+                              Grid.Row="1"/>
                 <ProgressRing Width="50" Height="50" VerticalAlignment="Center" 
                  HorizontalAlignment="Center" IsActive="True" Name="mainProgressBar" Visibility="Collapsed" Grid.Row="2"/>
             </Grid>
-
         </NavigationView>
 
         <!-- Open File -->
@@ -126,7 +116,7 @@
                     <Image Source="/Assets/StoreLogo.png"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Center" Grid.Column="0"/>
-                    
+
                     <TextBlock Grid.Column="1" Foreground="SlateGray"
                                FontSize="24"
                                FontWeight="SemiBold"
@@ -142,6 +132,5 @@
                 </Grid>
             </Canvas>
         </Viewbox>
-
     </Grid>
 </Window>
