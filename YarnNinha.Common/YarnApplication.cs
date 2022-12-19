@@ -1,5 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using YarnNinja.Common.Utils;
 
 namespace YarnNinja.Common
 {
@@ -21,31 +24,27 @@ namespace YarnNinja.Common
         UNKNOWN
     }
 
-    public class ContainerProccessedArgs
+    public class ContainerAddedEventArgs : EventArgs
     {
-        public ContainerProccessedArgs(string containerId, int totalContainerLogs, int currentContainerLogsCount) 
-        { ContainerId = containerId; TotalContainerLogs = totalContainerLogs; CurrentContainerLogsCount = currentContainerLogsCount; }
-        public string ContainerId { get; } // readonly
-        public int TotalContainerLogs { get;  }
-        public int CurrentContainerLogsCount { get; }
+        public int ContainersCount { get; set; }
+        public int Progress { get; set; }
     }
 
     public class YarnApplication
     {
-        
+        public delegate void ContainerAddedEventHandler(object sender, ContainerAddedEventArgs e);
+        public event ContainerAddedEventHandler ContainerAddedEvent;
+
 
         internal const string applicationIdPattern = "application_\\d+_\\d{4,}";
-        internal const string containerLogPattern = "Container: (.*?) on (.*?)LogAggregationType:.*?LogContents:(.*?)End of LogType:(.*?)[\\*]+";
+        internal const string containerLogPattern = "Container: (.*?) on (.*?)LogAggregationType:.*?LogContents:(.*?)End of LogType:(.*?)   ";
         const string applicationExsitStausTezPattern = "Unregistering application from RM, exitStatus=(.*), exitMessage=(.*) stats:submittedDAGs=(\\d*), successfulDAGs=(\\d*), failedDAGs=(\\d*), killedDAGs=(\\d*)";
         const string applicationExsitStausMapredPattern = "Final Stats: PendingReds:(\\d*) ScheduledMaps:(\\d*) ScheduledReds:(\\d*) AssignedMaps:(\\d*) AssignedReds:(\\d*) CompletedMaps:(\\d*) CompletedReds:(\\d*) ContAlloc:(\\d*) ContRel:(\\d*) HostLocal:(\\d*) RackLocal:(\\d*)";
         const string userPattern = "export USER=\"(.*?)\"";
         const string queueNameTezPattern = ".*queueName=(.*)";
         const string queueNameMapredPattern = ".*queue: (.*)";
 
-        public delegate void ContainerProccessedHandler(object sender, ContainerProccessedArgs e);
-        public event ContainerProccessedHandler ContainerProccessed;
-        private int totalContainerLogs = 0;
-        private int currentContainerLogsCount = 0;
+        private YarnLogFileReader logFileReader;
 
         public string ShortId
         {
@@ -101,86 +100,88 @@ namespace YarnNinja.Common
         private YarnApplication() { }
 
 
-        public YarnApplication(string yarnLog)
+        public YarnApplication(YarnLogFileReader file)
         {
-            this.YarnLog = yarnLog;
-
-            Header = new YarnApplicationHeader();
-
-            if (Regex.IsMatch(this.YarnLog, applicationIdPattern))
-            {
-                Header.Id = Regex.Match(this.YarnLog, applicationIdPattern).Value;
-            }
-            else
-            {
-                throw new InvalidYarnFileFormat("Unable to find the yarn application ID!");
-            }
-
-            var isTez = yarnLog.Contains("./tezlib");
-            var isSpark = false;
-            var isMapred = false;
-
-            if (!isTez)
-                isSpark = yarnLog.Contains("__spark_conf__");
-
-            if (!isTez && !isSpark)
-                isMapred = yarnLog.Contains("./mr-framework");
-            
-
-            Header.Type = (isTez ? YarnApplicationType.Tez : (isMapred ? YarnApplicationType.MapReduce : (isSpark ? YarnApplicationType.Spark : throw new InvalidYarnFileFormat("Not Support Yarn App Format!"))));
-
-
-           // ParseContainersAsync().Wait();
-
+            this.logFileReader = file;
         }
 
 
         public async Task ParseContainersAsync()
         {
             this.Containers = new List<YarnApplicationContainer>();
-            Regex r = new(containerLogPattern, RegexOptions.Singleline);
 
-            //Estimate the number of containers logs
-            //FIXME: find a better way to estimate number of containers, without proccesing all the file with regex
-            totalContainerLogs = (int) (this.YarnLog.Length / 15000);
-
-            Match m = r.Match(this.YarnLog);
-            while (m.Success)
+            while (!logFileReader.EndOfFile)
             {
-                ++currentContainerLogsCount;
-                Group containerId = m.Groups[1];
-                Group workernode = m.Groups[2];
-
-                CaptureCollection containerc = containerId.Captures;
-                CaptureCollection workernodec = workernode.Captures;
-                var id = containerc[0].Value.Trim();
-
-
-                var container = this.Containers.FirstOrDefault(p => p.Id.Equals(id));
-
-
-                if (container is null)
+                var line = logFileReader.ReadLine();
+                if (string.IsNullOrEmpty(line))
                 {
-                    container = new YarnApplicationContainer(this.Header.Type) { Id = id, WorkerNode = workernodec[0].Value.Trim() };
-
-                    this.Containers.Add(container);
+                    continue;
                 }
 
-                var LogText = m.Groups[3].Captures[0].Value.Trim();
+                string containerName;
+                string workerName;
+                if (YarnParserHelper.TryContainerLogBegin(line, out containerName, out workerName))
+                {
+                    var container = this.Containers.FirstOrDefault(p => p.Id.Equals(containerName));
+                    if (container is null) // Check if container doesnt exists then create it and add containerLog to it
+                    {
 
-                var logType = m.Groups[4].Captures[0].Value.Trim();
+                        container = new YarnApplicationContainer(this) { Id = containerName, WorkerNode = workerName };
 
-                container.Logs.Add(new YarnApplicationContainerLog(this.Header.Type, LogText, logType));
+                        Debug.Write(containerName, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")} Container Added ({logFileReader.ProgressPrecent})");
+
+                        this.Containers.Add(container);
+                        ContainerAddedEvent?.Invoke(container, new ContainerAddedEventArgs { ContainersCount = this.Containers.Count, Progress = (int)logFileReader.ProgressPrecent });
+
+                    }
+
+                    while (!logFileReader.EndOfFile)
+                    {
+                        // Process ContainerLog
+                        line = logFileReader.ReadLine();
+
+                        
+                        // Check if end of containerLog
+                        string logType;
+                        if (YarnParserHelper.TryContainerLogLogType(line, out logType))
+                        {
+                            //Check if line is LogType
+                            var containerlog = new YarnApplicationContainerLog(logType, container);
+                            Debug.Write(logType, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLogType Added ({logFileReader.ProgressPrecent})");
 
 
-                m = m.NextMatch();
-                this.ContainerProccessed?.Invoke(this, new ContainerProccessedArgs(id, totalContainerLogs, currentContainerLogsCount));
+                            container.Logs.Add(containerlog);
+
+                            while (!logFileReader.EndOfFile)
+                            {
+                                line = logFileReader.ReadLine();
+                                if (line.StartsWith("LogContents:"))
+                                {
+                                    await containerlog.ParseLogsAsync(logFileReader);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+
+                    }
+                }
             }
-            this.ContainerProccessed?.Invoke(this, new ContainerProccessedArgs("", currentContainerLogsCount, currentContainerLogsCount));
+
+
+
+            if (this.Header is null || string.IsNullOrEmpty(this.Header.Id) || this.Header.Type == YarnApplicationType.NA || this.Containers.Count == 0)
+            {
+                throw new InvalidYarnFileFormat("Log file is not a yarn applicatin Log");
+            }
 
 
             if (this.ApplicationMaster is not null)
                 await ParseHeaderInfoAsync();
+
+
+            return;
+
         }
 
         private async Task ParseHeaderInfoAsync()
@@ -214,16 +215,17 @@ namespace YarnNinja.Common
             // Get Queue Name
             if (this.Header.Type == YarnApplicationType.Tez)
             {
-                var dagSubmitted = allSysLogs.Where(p =>
+                var dagSubmitted = allSysLogs.Where(p => p.Function is not null &&
                                     p.Function.StartsWith("IPC Server handler") &&
                                     p.Msg.Contains("[Event:DAG_SUBMITTED]")
-                    ).FirstOrDefault();
+                    );
 
                 r = new Regex(queueNameTezPattern, RegexOptions.Singleline);
 
                 if (dagSubmitted is not null)
                 {
-                    Match m = r.Match(dagSubmitted.Msg);
+                    var dagsubmitttedLine = dagSubmitted.FirstOrDefault();
+                    Match m = r.Match(dagsubmitttedLine.Msg);
 
                     while (m.Success)
                     {
@@ -235,7 +237,7 @@ namespace YarnNinja.Common
             }
             else if (this.Header.Type == YarnApplicationType.MapReduce)
             {
-                var rmCommunicator = allSysLogs.Where(p =>
+                var rmCommunicator = allSysLogs.Where(p => p.Function is not null &&
                                     p.Function.Equals("main") &&
                                     p.Msg.Contains("queue:")
                     ).FirstOrDefault();
@@ -264,7 +266,7 @@ namespace YarnNinja.Common
 
             if (Header.Type == YarnApplicationType.Tez)
             {
-                var shutdownLogs = allSysLogs.Where(p => p.Function.Equals("AMShutdownThread")).ToList();
+                var shutdownLogs = allSysLogs.Where(p => p.Function is not null && p.Function.Equals("AMShutdownThread")).ToList();
 
                 r = new Regex(applicationExsitStausTezPattern, RegexOptions.Singleline);
 
@@ -298,10 +300,10 @@ namespace YarnNinja.Common
                     }
                 }
             }
-            else if(Header.Type == YarnApplicationType.MapReduce)
+            else if (Header.Type == YarnApplicationType.MapReduce)
             {
-                var shutdownLogs = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO 
-                && p.Function.StartsWith("Thread") 
+                var shutdownLogs = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function is not null
+                && p.Function.StartsWith("Thread")
                 && p.Module.Equals("org.apache.hadoop.mapreduce.v2.app.rm.RMContainerAllocator")
                 && p.Msg.StartsWith("Final Stats:")).ToList();
 
@@ -341,7 +343,7 @@ namespace YarnNinja.Common
             if (this.Header.Type == YarnApplicationType.Tez)
             {
                 //var allDagLogs = this.ApplicationMaster.GetLogsByBaseType(LogType.DAG);
-                var conatinerStatus = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function.StartsWith("Dispatcher thread") && p.Module.Contains("container.AMContainerImpl")).ToList();
+                var conatinerStatus = allSysLogs.Where(p => p.TraceLevel == TraceLevel.INFO && p.Function is not null && p.Function.StartsWith("Dispatcher thread") && p.Module.Contains("container.AMContainerImpl")).ToList();
                 r = new Regex("Container (.*) exited with diagnostics set to Container (.*), exitCode=(.*)\\. (\\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3})\\])?([\\s\\S\\r\\n.]*)", RegexOptions.Multiline);
 
                 foreach (var line in conatinerStatus)
@@ -362,7 +364,7 @@ namespace YarnNinja.Common
                         {
                             container.Status = statusg.Captures[0].Value.Trim();
                             container.StatusCode = statusCodeg.Captures[0].Value.Trim();
-                            if (statusTimeg!=null && statusTimeg.Captures.Count >0 && !string.IsNullOrEmpty(statusTimeg.Captures[0].Value))
+                            if (statusTimeg != null && statusTimeg.Captures.Count > 0 && !string.IsNullOrEmpty(statusTimeg.Captures[0].Value))
                                 container.StatusTime = DateTime.ParseExact(statusTimeg.Captures[0].Value.Trim(), "yyyy-MM-dd HH:mm:ss.fff", null);
 
                             container.StatusMessage = StatusMessageg.Captures[0].Value.Trim();
@@ -371,8 +373,8 @@ namespace YarnNinja.Common
 
                 }
             }
-           
-            
+
+
         }
     }
 }

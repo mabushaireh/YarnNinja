@@ -8,8 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.UI.Core;
 using YarnNinja.App.WinApp.Views;
 using YarnNinja.Common;
+using YarnNinja.Common.Utils;
 
 namespace YarnNinja.App.WinApp
 {
@@ -18,6 +20,7 @@ namespace YarnNinja.App.WinApp
         private readonly List<YarnApplication> yarnApps = new();
         readonly BackgroundWorker bgWorker = new();
         DoWorkEventHandler handler;
+        private int cuurentContainerCount = 0;
 
         public Shell()
         {
@@ -67,7 +70,7 @@ namespace YarnNinja.App.WinApp
         {
             if (e.ProgressPercentage == 0)
             {
-                mainStatusBar.Message = "Yarn App is loading: 0%";
+                mainStatusBar.Message = $"Yarn App is loading: 0%, Containers: ({cuurentContainerCount})";
                 mainStatusBar.IsOpen = true;
                 mainStatusBar.Severity = InfoBarSeverity.Informational;
                 mainProgressBar.IsActive = true;
@@ -80,22 +83,10 @@ namespace YarnNinja.App.WinApp
                 mainProgressBar.Visibility = Visibility.Collapsed;
                 mainStatusBar.IsOpen = true;
 
-                if (bgWorker.CancellationPending)
-                {
-                    mainStatusBar.Severity = InfoBarSeverity.Error;
-                    mainStatusBar.Message = "Failed to Load App, Application already loaded!";
-                    return;
-                }
                 mainStatusBar.Severity = InfoBarSeverity.Success;
 
-                mainStatusBar.Message = "Yarn App is loading: 100%";
+                mainStatusBar.Message = $"Yarn App is loading: 100%, Containers: ({cuurentContainerCount})";
 
-                if (this.yarnApps.Count < 1)
-                {
-                    mainStatusBar.Severity = InfoBarSeverity.Error;
-
-                    mainStatusBar.Message = "Yarn App failed to load";
-                }
 
                 NavigationViewItem navItem = new()
                 {
@@ -107,21 +98,21 @@ namespace YarnNinja.App.WinApp
                     ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
                 };
 
-                
+
                 navItem.Icon = new BitmapIcon()
                 {
                     UriSource = new Uri("ms-appx:///Assets/App.png"),
                     ShowAsMonochrome = false
                 };
 
-                NavigationView.MenuItems.Add(navItem);
+                AddMenuItem(NavigationView, (navItem));
 
                 SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
             }
             else
             {
                 mainStatusBar.Severity = InfoBarSeverity.Informational;
-                mainStatusBar.Message = $"Yarn App is loading: {e.ProgressPercentage}%";
+                mainStatusBar.Message = $"Yarn App is loading: {e.ProgressPercentage}%,, Containers: ({cuurentContainerCount})";
                 mainStatusBar.IsOpen = true;
             }
         }
@@ -156,7 +147,7 @@ namespace YarnNinja.App.WinApp
                 navItem = new()
                 {
                     Content = container.ShortId,
-                    
+
                     Tag = "YarnNinja.App.WinApp.Views.YarnAppContainerPage"
                 };
 
@@ -171,46 +162,44 @@ namespace YarnNinja.App.WinApp
                     ShowAsMonochrome = false
                 };
 
-                parent.MenuItems.Add(navItem);
-                parent.IsExpanded = true;
+                AddMenuItem(parent, navItem);
             }
 
-            navItem.IsSelected = true;
             SetCurrentNavigationViewItem(navItem, container);
         }
 
-        private void OpenYarnAppLogFile(string path)
+        private async Task OpenYarnAppLogFileAsync(string path)
         {
-            var file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-            var logText = FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
-            this.bgWorker.ReportProgress(10);
-            var yarnApp = new YarnApplication(logText);
-            yarnApp.ContainerProccessed += YarnApp_ContainerProccessed;
-            yarnApp.ParseContainersAsync();
+           
+            var file = new YarnLogFileReader();
+            file.OpenFile(path);
 
-            if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Any())
-            {
-                this.bgWorker.ReportProgress(100);
-                bgWorker.CancelAsync();
-                yarnApp = null;
-                return;
-            }
-
+            this.bgWorker.ReportProgress((int)file.ProgressPrecent);
+            var yarnApp = new YarnApplication(file);
             this.yarnApps.Add(yarnApp);
+            file.ProgressEventHandler += File_ProgressEventHandler;
+            yarnApp.ContainerAddedEvent += YarnApp_ContainerAddedEvent;
+
+            await yarnApp.ParseContainersAsync();
+
+            if (yarnApps.Where(p => p.Header.Id == yarnApp.Header.Id).Count() > 1)
+            {
+                this.yarnApps.Remove(yarnApp); 
+            }
         }
 
-        private void YarnApp_ContainerProccessed(object sender, ContainerProccessedArgs e)
+        private void YarnApp_ContainerAddedEvent(object sender, ContainerAddedEventArgs e)
         {
-            // calculate progress 
-            var progress = (double)e.CurrentContainerLogsCount/ (double)e.TotalContainerLogs;
-            // Convert to %
-            progress = progress * 100;
-            // prorate to 80%
-            // this 80% of the progress, calcualte the overall progress assuming it already progressed 10%
-            progress = progress * 80 / 100;
-            progress += 10;
-            this.bgWorker.ReportProgress((int)progress);
+            cuurentContainerCount = e.ContainersCount;
+            this.bgWorker.ReportProgress(e.Progress, e.ContainersCount);
+
         }
+
+        private void File_ProgressEventHandler(object sender, EventArgs e)
+        {
+            this.bgWorker.ReportProgress((int)(sender as YarnLogFileReader).ProgressPrecent);
+        }
+
 
         private void ApplyTheme()
         {
@@ -225,8 +214,7 @@ namespace YarnNinja.App.WinApp
             handler = (sender, e) =>
             {
                 bgWorker.ReportProgress(0);
-                OpenYarnAppLogFile(path);
-                bgWorker.ReportProgress(100);
+                OpenYarnAppLogFileAsync(path);
             };
 
             bgWorker.DoWork += handler;
@@ -239,6 +227,8 @@ namespace YarnNinja.App.WinApp
             var yarnApp = this.yarnApps.Where(p => p.Header.Id == yarnAppName).FirstOrDefault();
             this.yarnApps.Remove(yarnApp);
             yarnApp = null;
+
+
             var menuItems = GetNavigationViewItems();
             var menuItem = menuItems.Where(p => p.Content.ToString() == yarnAppName).FirstOrDefault();
             NavigationView.MenuItems.Remove(menuItem);
@@ -254,11 +244,6 @@ namespace YarnNinja.App.WinApp
                 var select = menuItems.Where(p => p.Content.ToString() == "About").FirstOrDefault();
                 SetCurrentNavigationViewItem(select, null);
             }
-        }
-
-        private void NavigationView_Collapsed(NavigationView sender, NavigationViewItemCollapsedEventArgs args)
-        {
-            (args.CollapsedItem as NavigationViewItem).IsExpanded = true;
         }
     }
 }

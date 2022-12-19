@@ -26,7 +26,7 @@
                         IsBackButtonVisible="Collapsed"
                         Background="Transparent"
                         IsSettingsVisible="False"             
-                        Margin="0" Collapsed="NavigationView_Collapsed">
+                        Margin="0">
 
             <NavigationView.MenuItems>
             </NavigationView.MenuItems>

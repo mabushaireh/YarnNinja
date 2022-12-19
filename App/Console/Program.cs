@@ -72,7 +72,9 @@ namespace YarnNinja.App.Console
                     return;
                 }
 
-                OpenAsync(File.ReadAllText(path));
+                var file = new YarnLogFileReader();
+                file.OpenFile(path);
+                OpenAsync(file);
             }
 
             Application.Run();
@@ -271,33 +273,25 @@ namespace YarnNinja.App.Console
                         return;
                     }
 
-                    OpenAsync(File.ReadAllText(path));
+                    var yarnLogFileReader = new YarnLogFileReader();
+                    yarnLogFileReader.OpenFile(path);
+
+                    OpenAsync(yarnLogFileReader);
                 }
             }
 
         }
 
-        private static async Task OpenAsync(string initialText)
+        private static async Task OpenAsync(YarnLogFileReader file)
         {
-            app = new YarnApplication(initialText);
-            app.ContainerProccessed += App_ContainerProccessed;
+            app = new YarnApplication(file);
             app.ParseContainersAsync();
 
             await RefreshYarnAppInfo();
         }
 
-        private static void App_ContainerProccessed(object sender, ContainerProccessedArgs e)
-        {
-            // calculate progress 
-            var progress = (double)e.CurrentContainerLogsCount / (double)e.TotalContainerLogs;
-            // Convert to %
-            progress = progress * 100;
-            // prorate to 80%
-            // this 80% of the progress, calcualte the overall progress assuming it already progressed 10%
-            progress = progress * 80 / 100;
-            progress += 10;
-            //bgWorker.ReportProgress((int)progress);
-        }
+       
+
 
         private static async Task<FrameView> BuildHeaderAsync()
         {

@@ -8,6 +8,8 @@ namespace YarnNinja.Common.Utils
 {
     public static class DateTimeUtils
     {
-        public const string AppDateTimeFormat = "yyyy-MM-dd HH:mm:ss,fff";
+        public const string AppDateTimeFormat1 = "yyyy-MM-dd HH:mm:ss,fff";
+        public const string AppDateTimeFormat2 = "yy/MM/dd HH:mm:ss";
+
     }
 }

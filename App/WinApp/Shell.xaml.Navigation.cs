@@ -38,8 +38,6 @@ namespace YarnNinja.App.WinApp
             }
 
             SetCurrentNavigationViewItem(args.SelectedItemContainer as NavigationViewItem, obj);
-            (args.SelectedItemContainer as NavigationViewItem).IsExpanded = true;
-
         }
 
         private NavigationViewItem GetParentMenuItem(string menuName)
@@ -109,6 +107,31 @@ namespace YarnNinja.App.WinApp
             ContentFrame.Navigate(type, obj);
         }
 
+
+        public NavigationViewItem AddMenuItem(object parent, NavigationViewItem child)
+        {
+            if (parent is NavigationViewItem)
+            {
+                var childExist = (parent as NavigationViewItem).MenuItems.Where(p => (p as NavigationViewItem).Content == child.Content).FirstOrDefault();
+
+                if (childExist is not null)
+                    return (childExist as NavigationViewItem);
+
+                (parent as NavigationViewItem).MenuItems.Add(child);
+            }
+            else
+            {
+                var childExist = (parent as NavigationView).MenuItems.Where(p => (p as NavigationViewItem).Content == child.Content).FirstOrDefault();
+
+                if (childExist is not null)
+                    return (childExist as NavigationViewItem);
+
+                (parent as NavigationView).MenuItems.Add(child);
+            }
+            return child;
+
+
+        }
 
     }
 }

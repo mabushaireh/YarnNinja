@@ -6,15 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YarnNinja.Common;
+using YarnNinja.Common.Utils;
 
 namespace YarnNinja.CommonTests
 {
     [TestClass()]
     public class BaseCommonTest
     {
-        private const string tezLogFileName = @"./Samples/application_1639352826059_8646.log";
-        private const string mapreduceLogFileName = "./Samples/application_1647350095798_0001.log";
-        private const string sparkLogFileName = "./Samples/1648899966078_0027.log";
+        protected const string tezLogFileName = @"./Samples/application_1639352826059_8646.log";
+        protected const string mapreduceLogFileName = "./Samples/application_1647350095798_0001.log";
+        protected const string sparkLogFileName = "./Samples/1648899966078_0027.log";
 
         private static YarnApplication? _tezYarnApp;
         private static YarnApplication? _mapreduceYarnApp;
@@ -28,8 +29,9 @@ namespace YarnNinja.CommonTests
                 case YarnApplicationType.Tez:
                     if (_tezYarnApp == null)
                     {
-                        var tezlog = File.ReadAllText(tezLogFileName);
-                        _tezYarnApp = new (tezlog);
+                        var yarnLogReader = new YarnLogFileReader();
+                        yarnLogReader.OpenFile(tezLogFileName);
+                        _tezYarnApp = new (yarnLogReader);
                         _tezYarnApp.ParseContainersAsync();
 
                     }
@@ -37,18 +39,18 @@ namespace YarnNinja.CommonTests
                 case YarnApplicationType.MapReduce:
                     if (_mapreduceYarnApp == null)
                     {
-                        var mapreducelog = File.ReadAllText(mapreduceLogFileName);
-
-                        _mapreduceYarnApp = new(mapreducelog);
+                        var yarnLogReader = new YarnLogFileReader();
+                        yarnLogReader.OpenFile(mapreduceLogFileName);
+                        _mapreduceYarnApp = new(yarnLogReader);
                         _mapreduceYarnApp.ParseContainersAsync();
                     }
                     return _mapreduceYarnApp;
                 case YarnApplicationType.Spark:
                     if (_sparkYarnApp == null)
                     {
-                        var sparklog = File.ReadAllText(sparkLogFileName);
-
-                        _sparkYarnApp = new(sparklog);
+                        var yarnLogReader = new YarnLogFileReader();
+                        yarnLogReader.OpenFile(sparkLogFileName);
+                        _sparkYarnApp = new(yarnLogReader);
                         _sparkYarnApp.ParseContainersAsync();
                     }
                     return _sparkYarnApp;

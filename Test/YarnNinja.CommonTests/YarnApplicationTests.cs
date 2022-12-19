@@ -12,6 +12,23 @@ namespace YarnNinja.CommonTests
     {
 
         [TestMethod()]
+        [DataRow(YarnApplicationType.Tez, 367, 10, DisplayName = "Tez Retrun Correct Container Counts")]
+        [DataRow(YarnApplicationType.MapReduce, 3,1, DisplayName = "MapReduce Retrun Correct Container Counts")]
+        [DataRow(YarnApplicationType.Spark, 31, 3, DisplayName = "Spark Return Retrun Correct Container Counts")]
+        public void YarnApplication_ReturnCorrectConainerWorkerNodeCounts(YarnApplicationType expectedAppType, int expetedContainerCount, int expetedWorkerCount)
+        {
+
+            if (GetActiveYarnApp(expectedAppType) == null)
+            {
+                Assert.Fail("Failed to Parse App");
+            }
+
+            Assert.AreEqual(expected: expetedContainerCount, actual: GetActiveYarnApp(expectedAppType)?.Containers.Count,"Wrong Container Count");
+            Assert.AreEqual(expected: expetedWorkerCount, actual: GetActiveYarnApp(expectedAppType)?.WorkerNodes.Count, "Wrong Workernodes Count");
+
+        }
+
+        [TestMethod()]
         [DataRow(YarnApplicationType.Tez, DisplayName = "Valid Tez Yarn Application")]
         [DataRow(YarnApplicationType.MapReduce, DisplayName = "Valid Mapreduce Yarn Application")]
         [DataRow(YarnApplicationType.Spark, DisplayName = "Valid Spark Yarn Application")]
@@ -27,18 +44,47 @@ namespace YarnNinja.CommonTests
         }
 
         [TestMethod()]
-        [DataRow("FakeFile.log", DisplayName = "InvalidFaileFormatException Expected")]
+        [DataRow("FakeFile.log", DisplayName = "InvalidYarnFileFormat Expected")]
         public void YarnApplication_InvalidFileFormat_NotAYarnApp(string fileName)
         {
             YarnApplication? _yarnApp = null;
             try
             {
+                var file = new YarnLogFileReader();
 
-                var log = File.ReadAllText(@"./Samples/" + fileName);
-                _yarnApp = new YarnApplication(log);
+                file.OpenFile(@"./Samples/" + fileName);
+                
+                _yarnApp = new YarnApplication(file);
                 _yarnApp.ParseContainersAsync();
 
-                Assert.Fail(); // If it gets to this line, no exception was thrown
+                //Assert.Fail();
+            }
+            catch (InvalidYarnFileFormat)
+            {
+                Assert.IsNull(_yarnApp);
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
+
+
+        [TestMethod()]
+        [DataRow("C:\\Users\\maabusha.MIDDLEEAST.000\\Downloads\\application_1671046156402_3288.log\\application_1671046156402_3288.log", DisplayName = "Big File Parse Expected")]
+        public void YarnApplication_BigFileParse(string filePath)
+        {
+            YarnApplication? _yarnApp = null;
+            try
+            {
+                var file = new YarnLogFileReader();
+
+                file.OpenFile(filePath);
+
+                _yarnApp = new YarnApplication(file);
+                _yarnApp.ParseContainersAsync();
+
+                //Assert.Fail();
             }
             catch (InvalidYarnFileFormat)
             {
@@ -89,8 +135,8 @@ namespace YarnNinja.CommonTests
             string queue,
             YarnApplicationStatus appStatus)
         {
-            var startDate = DateTime.ParseExact(start, DateTimeUtils.AppDateTimeFormat, null);
-            var finsihDate = DateTime.ParseExact(finish, DateTimeUtils.AppDateTimeFormat, null);
+            var startDate = DateTime.ParseExact(start, DateTimeUtils.AppDateTimeFormat1, null);
+            var finsihDate = DateTime.ParseExact(finish, DateTimeUtils.AppDateTimeFormat1, null);
             var duration = finsihDate - startDate;
 
             Assert.AreEqual(expected: appId, actual: GetActiveYarnApp(appType)?.Header?.Id, "Application Id is not correct!");

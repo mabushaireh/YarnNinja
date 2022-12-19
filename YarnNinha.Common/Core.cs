@@ -5,6 +5,7 @@
     {
         Tez,
         MapReduce,
-        Spark
+        Spark,
+        NA
     }
 }

@@ -28,7 +28,7 @@ namespace YarnNinja.Common
         {
             get
             {
-                if (yarnApplicationType != YarnApplicationType.MapReduce)
+                if (YarnApplication.Header.Type != YarnApplicationType.MapReduce)
                 {
                     return -1;
                 }
@@ -54,7 +54,7 @@ namespace YarnNinja.Common
         {
             get
             {
-                if (yarnApplicationType != YarnApplicationType.MapReduce)
+                if (this.YarnApplication.Header.Type != YarnApplicationType.MapReduce)
                 {
                     return -1;
                 }
@@ -72,7 +72,7 @@ namespace YarnNinja.Common
             private set { }
         }
 
-        private readonly YarnApplicationType yarnApplicationType;
+        public YarnApplication YarnApplication;
         public string ApplicationType { get; private set; }
 
         private DateTime start = DateTime.MinValue;
@@ -83,12 +83,12 @@ namespace YarnNinja.Common
                 List<YarnApplicationLogLine> allLogs;
                 if (start == DateTime.MinValue)
                 {
-                    if (yarnApplicationType == YarnApplicationType.Tez || yarnApplicationType == YarnApplicationType.MapReduce)
+                    if (this.YarnApplication.Header.Type == YarnApplicationType.Tez || this.YarnApplication.Header.Type == YarnApplicationType.MapReduce)
                         // parse for container start time
-                        allLogs = GetLogsByBaseType(LogType.syslog);
+                        allLogs = GetLogsByBaseType(LogType.syslog).Where(p => p.Timestamp != DateTime.MinValue).ToList();
                     else
                     {
-                        allLogs = GetLogsByBaseType(LogType.stderr);
+                        allLogs = GetLogsByBaseType(LogType.stderr).Where(p => p.Timestamp != DateTime.MinValue ).ToList();
                         allLogs.AddRange(GetLogsByBaseType(LogType.stdout));
                     }
 
@@ -115,7 +115,7 @@ namespace YarnNinja.Common
 
                 if (finish == DateTime.MaxValue)
                 {
-                    if (yarnApplicationType == YarnApplicationType.Tez || yarnApplicationType == YarnApplicationType.MapReduce)
+                    if (this.YarnApplication.Header.Type == YarnApplicationType.Tez || this.YarnApplication.Header.Type == YarnApplicationType.MapReduce)
                         // parse for container start time
                         allLogs = GetLogsByBaseType(LogType.syslog);
                     else
@@ -164,7 +164,7 @@ namespace YarnNinja.Common
         public string StatusCode { get; internal set; }
         public DateTime StatusTime { get; internal set; }
 
-        public YarnApplicationContainer(YarnApplicationType applicationType) { this.yarnApplicationType = applicationType; }
+        public YarnApplicationContainer(YarnApplication yarnApplication) { this.YarnApplication = yarnApplication; }
 
         [ExcludeFromCodeCoverage]
         private YarnApplicationContainer() { }
