@@ -163,7 +163,7 @@ namespace YarnNinja.Common.Utils
             correctDate = DateTime.MinValue;
             lineWithoutDate = line;
             Regex r = new(AppDateTimePattern1, RegexOptions.Singleline);
-            Match m = r.Match(line);
+            Match m = r.Match(line.Trim());
 
 
             if (m.Success)
@@ -195,7 +195,7 @@ namespace YarnNinja.Common.Utils
             traceLevel = "";
 
             Regex r = new(yarnLogLinePattern1, RegexOptions.Singleline);
-            Match m = r.Match(line);
+            Match m = r.Match(line.Trim());
             if (m.Success)
             {
                 Group traceLevelg = m.Groups["TraceLevel"];

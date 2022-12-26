@@ -19,11 +19,9 @@
                VerticalAlignment="Center" />
 
         <!-- Main Beef -->
-        <NavigationView x:Name="NavigationView"
-                        Loaded="NavigationView_Loaded"
-                        SelectionChanged="NavigationView_SelectionChanged"
+        <NavigationView x:Name="AppsBrowser"
+                        SelectionChanged="AppsBrowser_SelectionChanged"
                         Header="Yarn Ninja"
-                        IsBackButtonVisible="Collapsed"
                         Background="Transparent"
                         IsSettingsVisible="False"             
                         Margin="0">

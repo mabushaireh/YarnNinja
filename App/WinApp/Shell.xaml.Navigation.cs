@@ -11,12 +11,7 @@ namespace YarnNinja.App.WinApp
 {
     public sealed partial class Shell : INavigation
     {
-        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-        {
-            //SetCurrentNavigationViewItem(GetNavigationViewItems(typeof(YarnAppPage)).First());
-        }
-
-        private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        private void AppsBrowser_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
 
             Object obj;
@@ -45,7 +40,7 @@ namespace YarnNinja.App.WinApp
         {
 
             List<NavigationViewItem> result = new();
-            var items = NavigationView.MenuItems.Select(i => (NavigationViewItem)i).ToList();
+            var items = AppsBrowser.MenuItems.Select(i => (NavigationViewItem)i).ToList();
             foreach (var item in items)
             {
                 var child = item.MenuItems.Where(p => (p as NavigationViewItem).Content.ToString() == menuName).FirstOrDefault();
@@ -57,8 +52,8 @@ namespace YarnNinja.App.WinApp
         private List<NavigationViewItem> GetNavigationViewItems()
         {
             List<NavigationViewItem> result = new();
-            var items = NavigationView.MenuItems.Select(p => (NavigationViewItem)p).ToList();
-            result.AddRange(NavigationView.FooterMenuItems.Select(p => (NavigationViewItem)p).ToList());
+            var items = AppsBrowser.MenuItems.Select(p => (NavigationViewItem)p).ToList();
+            result.AddRange(AppsBrowser.FooterMenuItems.Select(p => (NavigationViewItem)p).ToList());
             result.AddRange(items);
 
             foreach (NavigationViewItem mainItem in items)
@@ -89,13 +84,13 @@ namespace YarnNinja.App.WinApp
 
 
             ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), obj);
-            NavigationView.Header = item.Content;
+            AppsBrowser.Header = item.Content;
             //NavigationView.SelectedItem = item;
         }
 
         private NavigationViewItem GetCurrentNavigationViewItem()
         {
-            return NavigationView.SelectedItem as NavigationViewItem;
+            return AppsBrowser.SelectedItem as NavigationViewItem;
         }
 
         private void SetCurrentPage(Type type, object obj)
@@ -162,7 +157,7 @@ namespace YarnNinja.App.WinApp
                 };
                 ;
 
-                NavigationView.MenuItems.Add(navItem);
+                AppsBrowser.MenuItems.Add(navItem);
                 SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
             }
 
@@ -178,7 +173,7 @@ namespace YarnNinja.App.WinApp
             {
                 var menuItems = GetNavigationViewItems();
                 var menuItem = menuItems.Where(p => p.Content.ToString() == child).FirstOrDefault();
-                NavigationView.MenuItems.Remove(menuItem);
+                AppsBrowser.MenuItems.Remove(menuItem);
                 menuItem = null;
 
 

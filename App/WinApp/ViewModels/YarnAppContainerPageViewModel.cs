@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -205,8 +206,6 @@ namespace YarnNinja.App.WinApp.ViewModels
                 if (!ShowDebug)
                     containersLogTypeLines = containersLogTypeLines.Where(p => p.TraceLevel != TraceLevel.DEBUG).ToList();
 
-
-
                 return containersLogTypeLines;
             }
 
@@ -235,6 +234,16 @@ namespace YarnNinja.App.WinApp.ViewModels
         protected override void OnActivated()
         {
             base.OnActivated();
+        }
+
+
+        public bool IsSyslog
+        {
+            get 
+            {
+                if (this.ContainersLogTypeLines.FirstOrDefault().Timestamp == DateTime.MinValue) return false;
+                return true;
+            }
         }
     }
 }

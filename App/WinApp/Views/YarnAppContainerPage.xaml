@@ -6,13 +6,14 @@
       xmlns:models="using:YarnNinja.App.WinApp.Models"
       xmlns:viewmodels="using:YarnNinja.App.WinApp.ViewModels"
       xmlns:local="using:YarnNinja.App.WinApp.Views"
-xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:fa="http://schemas.fontawesome.io/icons/" 
       mc:Ignorable="d"
       Background="Transparent">
 
     <Page.Resources>
-            <viewmodels:YarnAppContainerPageViewModel x:Key="vm"/>
+        <models:BoolToVisibilityConverter x:Key="Converter1"/>
+        <viewmodels:YarnAppContainerPageViewModel x:Key="vm"/>
     </Page.Resources>
     <Page.DataContext>
         <viewmodels:YarnAppContainerPageViewModel x:Name="ViewModel" />
@@ -99,10 +100,39 @@ xmlns:ctWinUI="using:CommunityToolkit.WinUI.UI.Controls"
                               HorizontalScrollBarVisibility="Auto" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" DoubleTapped="ContainersDataGrid_DoubleTapped"   
                           KeyUp="LogLinesDataGrid_KeyUp">
             <ctWinUI:DataGrid.Columns>
-                <ctWinUI:DataGridTextColumn Header="Timestamp" Width="SizeToCells" Binding="{Binding Timestamp}"/>
-                <ctWinUI:DataGridTextColumn Header="TraceLevel" Width="SizeToCells" Binding="{Binding TraceLevel}"/>
-                <ctWinUI:DataGridTextColumn Header="Function" Width="200" Binding="{Binding Function}"/>
-                <ctWinUI:DataGridTextColumn Header="Module" Width="200" Binding="{Binding Module}"/>
+                <ctWinUI:DataGridTextColumn Header="Line" Width="SizeToCells" Binding="{Binding LineNumber}"/>
+                <ctWinUI:DataGridTemplateColumn Header="Timestamp" Width="SizeToCells" CanUserResize="False">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Timestamp}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding IsSyslogLine, Converter={StaticResource Converter1}}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
+                <ctWinUI:DataGridTemplateColumn Header="Trace Level" Width="SizeToCells" CanUserResize="False">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding TraceLevel}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding IsSyslogLine, Converter={StaticResource Converter1}}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
+                <ctWinUI:DataGridTemplateColumn Header="Function" Width="SizeToCells" CanUserResize="False">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Function}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding IsSyslogLine, Converter={StaticResource Converter1}}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
+                <ctWinUI:DataGridTemplateColumn Header="Module" Width="SizeToCells" CanUserResize="False">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Module}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding IsSyslogLine, Converter={StaticResource Converter1}}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
                 <ctWinUI:DataGridTextColumn Header="Message"  Width="400" Binding="{Binding Msg}">
                     <ctWinUI:DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">

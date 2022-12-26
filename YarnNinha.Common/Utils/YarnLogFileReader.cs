@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +17,10 @@ namespace YarnNinja.Common.Utils
         private long totalBytes = 0;
         public event EventHandler ProgressEventHandler;
         private int PreviousProgress = 0;
+        private int currentLineNumber = 0;
+
+        public int CurrentLineNumber { get { return currentLineNumber;  } }
+
 
         public void OpenFile(string filePath)
         {
@@ -34,6 +40,10 @@ namespace YarnNinja.Common.Utils
             if (EndOfFile == false)
             {
                 line = sr.ReadLine();
+
+                Debug.Write(this.CurrentLineNumber, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLine Read ({this.PreviousProgress})");
+
+                currentLineNumber++;
                 proccessedBytes += getLineByeteCount(line);
 
                 if ((int)ProgressPrecent > PreviousProgress) 

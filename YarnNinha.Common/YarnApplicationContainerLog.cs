@@ -144,7 +144,7 @@ namespace YarnNinja.Common
                 //Check if line starts with datetime stamp
                 var traceDatetime = DateTime.MinValue;
                 var logLine = new YarnApplicationLogLine();
-
+             
                 string lineWithoutDate = line;
                 if (YarnParserHelper.TryWithDateTime(line, out traceDatetime, out lineWithoutDate))
                 {
@@ -173,10 +173,12 @@ namespace YarnNinja.Common
                 }
                 else
                 {
+                    logLine.TraceLevel = TraceLevel.UNKNOWN;
                     logLine.Msg = line;
 
                 }
 
+                logLine.LineNumber = logFileReader.CurrentLineNumber;
                 this.LogLines.Add(logLine);
             }
 
