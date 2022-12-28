@@ -128,7 +128,7 @@ namespace YarnNinja.Common
 
                         container = new YarnApplicationContainer(this) { Id = containerName, WorkerNode = workerName };
 
-                        Debug.Write(containerName, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")} Container Added ({logFileReader.ProgressPrecent})");
+                        Debug.Write(containerName, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")} Container Added (Progress: {logFileReader.ProgressPrecent}, Lines: {logFileReader.CurrentLineNumber})");
 
                         this.Containers.Add(container);
                         ContainerAddedEvent?.Invoke(container, new ContainerAddedEventArgs { ContainersCount = this.Containers.Count, Progress = (int)logFileReader.ProgressPrecent });
@@ -147,7 +147,7 @@ namespace YarnNinja.Common
                         {
                             //Check if line is LogType
                             var containerlog = new YarnApplicationContainerLog(logType, container);
-                            Debug.Write(logType, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLogType Added ({logFileReader.ProgressPrecent})");
+                            Debug.Write(logType, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLogType Added (Progress: {logFileReader.ProgressPrecent}, Lines: {logFileReader.CurrentLineNumber})");
 
 
                             container.Logs.Add(containerlog);

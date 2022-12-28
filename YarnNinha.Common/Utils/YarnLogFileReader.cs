@@ -41,7 +41,7 @@ namespace YarnNinja.Common.Utils
             {
                 line = sr.ReadLine();
 
-                Debug.Write(this.CurrentLineNumber, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLine Read ({this.PreviousProgress})");
+                //Debug.Write(this.CurrentLineNumber, $"\n {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff")}\tLine Read ({this.PreviousProgress})");
 
                 currentLineNumber++;
                 proccessedBytes += getLineByeteCount(line);

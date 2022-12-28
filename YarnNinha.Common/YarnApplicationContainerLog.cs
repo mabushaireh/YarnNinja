@@ -81,7 +81,6 @@ namespace YarnNinja.Common
         public async Task ParseLogsAsync(YarnLogFileReader logFileReader)
         {
 
-
             //Loop till end of container lines
             this.LogLines = new List<YarnApplicationLogLine>();
 
