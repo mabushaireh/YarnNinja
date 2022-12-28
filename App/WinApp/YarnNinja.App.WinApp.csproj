@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0-preview2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0-preview3" />
     <PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
