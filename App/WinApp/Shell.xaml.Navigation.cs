@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +18,7 @@ namespace YarnNinja.App.WinApp
             Object obj;
 
             if (args.SelectedItemContainer is null) return;
-            if ((args.SelectedItemContainer as NavigationViewItem).Content.ToString().Equals("About")) return;
+            if ((args.SelectedItemContainer as NavigationViewItem).Content.ToString().Equals("About") || (args.SelectedItemContainer as NavigationViewItem).Content.ToString().Equals("Bookmarks")) return;
 
             if (!(args.SelectedItemContainer as NavigationViewItem).Content.ToString().StartsWith("application"))
             {
@@ -71,7 +72,6 @@ namespace YarnNinja.App.WinApp
 
         private void SetCurrentNavigationViewItem(NavigationViewItem item, object obj)
         {
-
             if (item == null)
             {
                 return;
@@ -81,7 +81,6 @@ namespace YarnNinja.App.WinApp
             {
                 return;
             }
-
 
             ContentFrame.Navigate(Type.GetType(item.Tag.ToString()), obj);
             AppsBrowser.Header = item.Content;
@@ -123,11 +122,11 @@ namespace YarnNinja.App.WinApp
                 //    //ToolTipService.SetToolTip(sender as NavigationViewItem, child);
                 //};
 
-                //navItem.Icon = new BitmapIcon()
-                //{
-                //    UriSource = new Uri("ms-appx:///Assets/Container.png"),
-                //    ShowAsMonochrome = false
-                //};
+                navItem.Icon = new BitmapIcon()
+                {
+                    UriSource = new Uri("ms-appx:///Assets/Container.png"),
+                    ShowAsMonochrome = false
+                };
                 var parentMenuItem = GetNavigationViewItems().Where(p => p.Content.ToString() == parent).FirstOrDefault();
 
                 // Check if contianer already open then switch only
@@ -144,10 +143,7 @@ namespace YarnNinja.App.WinApp
                     Content = child,
                     Tag = "YarnNinja.App.WinApp.Views.YarnAppPage"
                 };
-                navItem.Tapped += (sender, e) =>
-                {
-                    //ToolTipService.SetToolTip(sender as NavigationViewItem, navItem.Content);
-                };
+               
 
 
                 navItem.Icon = new BitmapIcon()
@@ -156,6 +152,25 @@ namespace YarnNinja.App.WinApp
                     ShowAsMonochrome = false
                 };
                 ;
+
+                NavigationViewItem bookmarks = new()
+                {
+                    Content = "Bookmarks",
+                    Tag = "YarnNinja.App.WinApp.Views.YarnAppPage"
+                };
+
+
+
+                bookmarks.Icon = new FontIcon()
+                {
+                    FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                    Glyph = "\xE7C1"
+
+                };
+
+
+                navItem.MenuItems.Add(bookmarks);
+                navItem.IsExpanded = true;
 
                 AppsBrowser.MenuItems.Add(navItem);
                 SetCurrentNavigationViewItem(navItem, this.yarnApps[^1]);
