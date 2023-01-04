@@ -80,14 +80,6 @@ namespace YarnNinja.App.WinApp.Views
 
 
 
-        private void ContainersDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-        {
-           
-        }
-
-        private void LogLinesDataGrid_KeyUp(object sender, KeyRoutedEventArgs e)
-        {
-
-        }
+        
     }
 }
