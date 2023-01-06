@@ -10,12 +10,6 @@ The vision for this tool is:
 4.	Compare two applications and highlight the differences helping in identifying the differences between the Good Job run and the Bad run
 5.	And more
 
-### Why to contribute:
-1.	Because you need the tool and you find it useful
-2.	Because you like to code
-3.	To create an impact on your team and maybe worldwide Hadoop community
-4.	Because its a learning experience, I’ve been learning a lot about different Hadoop subjects while creating first version of the tool.
-
 
 ### How to contribute:
 1.	You can contribute as a .NET developer if you have a .Net development skills or any advanced programing skills
@@ -26,7 +20,7 @@ The vision for this tool is:
 
 ### How to install:
 1. Download and extract the latest release
-2. Install Windows App SDK 1.1 Preview 3: https://aka.ms/windowsappsdk/1.1/1.1.0-preview3/windowsappruntimeinstall-1.1.0-preview3-x64.exe
+2. Install Windows App SDK 1.2. [download](https://aka.ms/windowsappsdk/1.2/latest/windowsappruntimeinstall-x64.exe)
 3. Run : YarnNinja.App.WinApp.exe from the folder you extracted
 
 ### Credits:
