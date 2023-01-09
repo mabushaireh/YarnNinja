@@ -13,7 +13,7 @@ namespace YarnNinja.CommonTests
 
         [TestMethod()]
         [DataRow(YarnApplicationType.Tez, 367, 10, DisplayName = "Tez Retrun Correct Container Counts")]
-        [DataRow(YarnApplicationType.MapReduce, 3,1, DisplayName = "MapReduce Retrun Correct Container Counts")]
+        [DataRow(YarnApplicationType.MapReduce, 3,2, DisplayName = "MapReduce Retrun Correct Container Counts")]
         [DataRow(YarnApplicationType.Spark, 31, 3, DisplayName = "Spark Return Retrun Correct Container Counts")]
         public void YarnApplication_ReturnCorrectConainerWorkerNodeCounts(YarnApplicationType expectedAppType, int expetedContainerCount, int expetedWorkerCount)
         {
@@ -100,9 +100,10 @@ namespace YarnNinja.CommonTests
         [TestMethod()]
         [DataRow(YarnApplicationType.Tez, 10, DisplayName = "Correct Workers for Tez")]
         [DataRow(YarnApplicationType.Spark, 3, DisplayName = "Correct Workers for Spark")]
-        public void YarnApplicationTest_ReturnWorkers(YarnApplicationType appType, int expectedWorkers)
+        [DataRow(YarnApplicationType.MapReduce, 2, DisplayName = "Correct Workers for Mapreduce")]
+        public void YarnApplicationTest_ReturnWorkers(YarnApplicationType appType, int? expectedWorkers)
         {
-            Assert.IsTrue(GetActiveYarnApp(appType)?.WorkerNodes?.Count == expectedWorkers);
+            Assert.AreEqual<int?>(GetActiveYarnApp(appType)?.WorkerNodes?.Count , expectedWorkers, "Number of workers is incorrect");
         }
 
         
@@ -126,6 +127,15 @@ namespace YarnNinja.CommonTests
             "NA",
             YarnApplicationStatus.SUCCEEDED,
             DisplayName = "Correct Header for Spark")]
+        [DataRow(YarnApplicationType.MapReduce,
+            "application_1647184687608_0039",
+            "2022-03-14 12:19:57,522",
+            "2022-03-14 12:20:25,643",
+            3,
+            "hive",
+            "default",
+            YarnApplicationStatus.SUCCEEDED,
+            DisplayName = "Correct Header for MapReduce")]
         public void YarnApplicationTest_ReturnCorrectHeaderInfo(YarnApplicationType appType,
             string appId,
             string start,
@@ -165,6 +175,22 @@ namespace YarnNinja.CommonTests
             Assert.AreEqual(expected: succDags, actual: GetActiveYarnApp(appType)?.Header?.SuccessfullDags, "Successfull Dags is not correct!");
             Assert.AreEqual(expected: failsDags, actual: GetActiveYarnApp(appType)?.Header?.FailedDags, "Failed Dags is not correct!");
             Assert.AreEqual(expected: killedDags, actual: GetActiveYarnApp(appType)?.Header?.KilledDags, "Killed Dags is not correct!");
+        }
+
+        [TestMethod()]
+        [DataRow(YarnApplicationType.MapReduce,
+            1, 1, 0, 0,
+            DisplayName = "Correct Mappersand Reducers for mapreduce")]
+        public void YarnApplicationTest_ReturnCorrectMappersReducedsCount(YarnApplicationType appType,
+            int completedMappers,
+            int completedReducers,
+            int failedMappers,
+            int failedReducers)
+        {
+            Assert.AreEqual(expected: completedMappers, actual: GetActiveYarnApp(appType)?.Header?.CompletedMappers, "Completed Mappers not correct!");
+            Assert.AreEqual(expected: completedReducers, actual: GetActiveYarnApp(appType)?.Header?.CompletedReducers, "Completed Reduces is not correct!");
+            Assert.AreEqual(expected: failedMappers, actual: GetActiveYarnApp(appType)?.Header?.FailedMappers, "Failed Mappers is not correct!");
+            Assert.AreEqual(expected: failedReducers, actual: GetActiveYarnApp(appType)?.Header?.FailedReducers, "Failed Reduces is not correct!");
         }
     }
 }
