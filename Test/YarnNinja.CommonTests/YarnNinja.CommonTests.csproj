@@ -25,4 +25,19 @@
     <Folder Include="Samples\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\Samples\1648899966078_0027_spark.log" Link="Samples\1648899966078_0027_spark.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\application_1639352826059_8646_tez.log" Link="Samples\application_1639352826059_8646_tez.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\application_1647184687608_0039_mapred.log" Link="Samples\application_1647184687608_0039_mapred.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\FakeFile.log" Link="Samples\FakeFile.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
