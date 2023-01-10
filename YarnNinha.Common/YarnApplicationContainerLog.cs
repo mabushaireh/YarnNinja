@@ -80,6 +80,22 @@ namespace YarnNinja.Common
 
         public async Task ParseLogsAsync(YarnLogFileReader logFileReader)
         {
+            // Check if log type is directy info and this is not the first container and containers exists
+            //if (this.BaseLogType == LogType.directory_info && this.YarnContainer.YarnApplication.DirectoryInfoLogs is not null)
+            //{
+            //    this.LogLines = this.YarnContainer.YarnApplication.DirectoryInfoLogs;
+
+            //    // skip till end of container log type Directory
+            //    while (!logFileReader.EndOfFile)
+            //    {
+            //        var line = logFileReader.ReadLine();
+
+            //        if (YarnParserHelper.IsContainerLogContentEnd(line))
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
 
             //Loop till end of container lines
             this.LogLines = new List<YarnApplicationLogLine>();
@@ -93,57 +109,18 @@ namespace YarnNinja.Common
                 }
                 if (YarnParserHelper.IsContainerLogContentEnd(line))
                 {
+                    //if (this.BaseLogType == LogType.directory_info && this.YarnContainer.YarnApplication.DirectoryInfoLogs is null)
+                    //{
+                    //    this.YarnContainer.YarnApplication.DirectoryInfoLogs = this.LogLines;
+                    //}
+
                     break;
                 }
-
-
-                string applicationId = "";
-                if ((this.YarnContainer.YarnApplication.Header is null || string.IsNullOrEmpty(this.YarnContainer.YarnApplication.Header.Id)) && YarnParserHelper.TryApplicationId(line, out applicationId))
-                {
-                    if (this.YarnContainer.YarnApplication.Header is null)
-                    {
-                        this.YarnContainer.YarnApplication.Header = new YarnApplicationHeader()
-                        {
-                            Type = YarnApplicationType.NA,
-                            Id = applicationId
-                        };
-                    }
-                    else
-                    {
-                        this.YarnContainer.YarnApplication.Header.Id = applicationId;
-                    }
-
-
-                }
-                //Check if line can tell what is the appType
-                YarnApplicationType yarnAppType = YarnApplicationType.NA;
-                if ((this.YarnContainer.YarnApplication.Header is null || this.YarnContainer.YarnApplication.Header.Type == YarnApplicationType.NA) &&
-                    this.BaseLogType == LogType.directory_info &&
-                    YarnParserHelper.TryApplicationType(line, out yarnAppType))
-                {
-                    if (this.YarnContainer.YarnApplication.Header is null)
-                    {
-                        this.YarnContainer.YarnApplication.Header = new YarnApplicationHeader()
-                        {
-                            Type = yarnAppType,
-                            Id = ""
-                        };
-                    }
-                    else
-                    {
-                        this.YarnContainer.YarnApplication.Header.Type = yarnAppType;
-                    }
-                }
-
-
-
-
-                // Process Lines
 
                 //Check if line starts with datetime stamp
                 var traceDatetime = DateTime.MinValue;
                 var logLine = new YarnApplicationLogLine();
-             
+
                 string lineWithoutDate = line;
                 if (YarnParserHelper.TryWithDateTime(line, out traceDatetime, out lineWithoutDate))
                 {
@@ -179,117 +156,6 @@ namespace YarnNinja.Common
 
                 logLine.LineNumber = logFileReader.CurrentLineNumber;
                 this.LogLines.Add(logLine);
-            }
-
-
-            return;
-            Regex r = null;
-            Regex l = null;
-            string timestampForamt = "";
-
-            if (this.yarnApplicationType != YarnApplicationType.Spark)
-            {
-                if (this.BaseLogType != LogType.syslog)
-                {
-                    var result = LogText.Split(new[] { '\r', '\n' });
-                    foreach (var line in result)
-                    {
-                        var logLine = new YarnApplicationLogLine
-                        {
-                            Msg = line
-                        };
-                        this.LogLines.Add(logLine);
-                    }
-                    return;
-                }
-                else
-                {
-
-                    if (this.YarnApplicationType == YarnApplicationType.Tez)
-                    {
-
-                        r = new Regex(yarnLogLineTezPattern, RegexOptions.Singleline);
-                        l = new Regex(yarnLogLineTezSplitPattern, RegexOptions.None);
-                        timestampForamt = "yyyy-MM-dd HH:mm:ss,fff";
-                    }
-
-                    else if (this.YarnApplicationType == YarnApplicationType.MapReduce)
-                    {
-                        r = new Regex(yarnLogLineMapredPattern, RegexOptions.None);
-                        l = new Regex(yarnLogLineMapredSplitPattern, RegexOptions.None);
-                        timestampForamt = "yyyy-MM-dd HH:mm:ss,fff";
-                    }
-                }
-            }
-            else
-            {
-                if (this.BaseLogType != LogType.stdout && this.BaseLogType != LogType.stderr)
-                {
-                    var result = LogText.Split(new[] { '\r', '\n' });
-                    foreach (var line in result)
-                    {
-                        var logLine = new YarnApplicationLogLine
-                        {
-                            Msg = line
-                        };
-                        this.LogLines.Add(logLine);
-                    }
-                    return;
-                }
-                else
-                {
-                    r = new Regex(yarnLogLineSparkPattern, RegexOptions.Singleline);
-                    l = new Regex(yarnLogLineSparkSplitPattern, RegexOptions.None);
-                    timestampForamt = "yy/MM/dd HH:mm:ss";
-                }
-            }
-
-
-            //FIXME: added new line at the end to make split works
-            var txt = LogText + Environment.NewLine;
-
-            var lines = l.Split(txt);
-            //Remove empty lines
-            lines = lines.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-
-
-            for (int i = 0; i < lines.Length;)
-            {
-
-                Match m = r.Match(lines[i]);
-                if (m.Success)
-                {
-                    Group timestampg = m.Groups["TimeStamp"];
-                    Group traceLevelg = m.Groups["TraceLevel"];
-                    Group functiong = m.Groups["Function"];
-                    Group moduleg = m.Groups["Module"];
-
-                    var logLine = new YarnApplicationLogLine
-                    {
-                        Timestamp = DateTime.ParseExact(timestampg.Captures[0].Value.Trim(), timestampForamt, null),
-                        Function = functiong.Captures[0].Value.Trim(),
-                        Module = moduleg.Captures[0].Value.Trim(),
-                        Msg = lines[i + 1].Trim()
-                    };
-
-                    var traceLevelstr = traceLevelg.Captures[0].Value.Trim();
-                    logLine.TraceLevel = traceLevelstr switch
-                    {
-                        "INFO" => TraceLevel.INFO,
-                        "WARN" => TraceLevel.WARN,
-                        "ERROR" => TraceLevel.ERROR,
-                        "DEBUG" => TraceLevel.DEBUG,
-                        _ => TraceLevel.UNKNOWN,
-                    };
-                    this.LogLines.Add(logLine);
-                    i += 2;
-                }
-                else
-                {
-                    //remove first lines dosest start with datatime stamp
-                    i++;
-                }
-
             }
         }
 

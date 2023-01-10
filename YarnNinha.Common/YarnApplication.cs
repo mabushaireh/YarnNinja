@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using YarnNinja.Common.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace YarnNinja.Common
 {
@@ -96,6 +97,8 @@ namespace YarnNinja.Common
             }
         }
 
+        public List<YarnApplicationLogLine> DirectoryInfoLogs { get; internal set; }
+
         [ExcludeFromCodeCoverage]
         private YarnApplication() { }
 
@@ -140,7 +143,7 @@ namespace YarnNinja.Common
                         // Process ContainerLog
                         line = logFileReader.ReadLine();
 
-                        
+
                         // Check if end of containerLog
                         string logType;
                         if (YarnParserHelper.TryContainerLogLogType(line, out logType))
@@ -170,7 +173,7 @@ namespace YarnNinja.Common
 
 
 
-            if (this.Header is null || string.IsNullOrEmpty(this.Header.Id) || this.Header.Type == YarnApplicationType.NA || this.Containers.Count == 0)
+            if (this.Containers.Count == 0)
             {
                 throw new InvalidYarnFileFormat("Log file is not a yarn applicatin Log");
             }
@@ -186,6 +189,55 @@ namespace YarnNinja.Common
 
         private async Task ParseHeaderInfoAsync()
         {
+            
+            if (this.ApplicationMaster is null)
+            {
+                throw new Exception("No Containers found!");
+            }
+
+            this.Header = new YarnApplicationHeader();
+
+            // Parse Application Id:
+            string applicationId = "";
+
+            //  Get the launch_container.sh log types in ApplicationMaster
+            var lunchContainersLog = this.ApplicationMaster.Logs.Where(p => p.BaseLogType == LogType.launch_container_sh).FirstOrDefault();
+
+            if (lunchContainersLog != null && lunchContainersLog.LogLines.Count > 0)
+            {
+                //  Loop lines and parse for ApplicationId
+                foreach (var logline in lunchContainersLog.LogLines)
+                {
+                    //  if found stop loop
+                    if (YarnParserHelper.TryApplicationId(logline.Msg, out applicationId))
+                    {
+                        //  get the appId
+                        this.Header.Id = applicationId;
+                        break;
+                    }
+                }
+            };
+
+
+            YarnApplicationType applicationType = YarnApplicationType.NA;
+
+            var directoryInfoLog = this.ApplicationMaster.Logs.Where(p => p.BaseLogType == LogType.directory_info).FirstOrDefault();
+
+            if (directoryInfoLog != null && directoryInfoLog.LogLines.Count > 0)
+            {
+                //  Loop lines and parse for ApplicationType pattern
+                foreach (var logline in directoryInfoLog.LogLines)
+                {
+                    //  if found stop loop
+                    if (YarnParserHelper.TryApplicationType(logline.Msg, out applicationType))
+                    {
+                        //  get the appId
+                        this.Header.Type = applicationType;
+                        break;
+                    }
+                }
+            };
+
             // Set start and finish for the application as the app Master Start and Finish
             this.Header.Start = this.ApplicationMaster.Start;
             this.Header.Finish = this.ApplicationMaster.Finish;
