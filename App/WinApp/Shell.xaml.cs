@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using YarnNinja.App.WinApp.Views;
@@ -69,6 +70,9 @@ namespace YarnNinja.App.WinApp
 
                 mainStatusBar.Message = $"Yarn App is loading: 100%, Containers: ({cuurentContainerCount})";
 
+                //FIXME: find a better way to trigger 100% complete, better ti add menu item on yarn parse complete
+                while (this.yarnApps[^1].Header is null)
+                    Thread.Sleep(100);
 
                 AddMenuItem(null, this.yarnApps[^1].Header.Id);
 

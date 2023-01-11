@@ -56,6 +56,7 @@ namespace YarnNinja.CommonTests
                 
                 _yarnApp = new YarnApplication(file);
                 _yarnApp.ParseContainersAsync();
+                file.CloseFile();
 
                 //Assert.Fail();
             }
@@ -83,6 +84,7 @@ namespace YarnNinja.CommonTests
 
                 _yarnApp = new YarnApplication(file);
                 _yarnApp.ParseContainersAsync();
+                file.CloseFile();
 
                 //Assert.Fail();
             }

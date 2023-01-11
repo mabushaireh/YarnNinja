@@ -33,6 +33,7 @@ namespace YarnNinja.CommonTests
                         yarnLogReader.OpenFile(tezLogFileName);
                         _tezYarnApp = new (yarnLogReader);
                         _tezYarnApp.ParseContainersAsync();
+                        yarnLogReader.CloseFile();
 
                     }
                     return _tezYarnApp;
@@ -43,6 +44,7 @@ namespace YarnNinja.CommonTests
                         yarnLogReader.OpenFile(mapreduceLogFileName);
                         _mapreduceYarnApp = new(yarnLogReader);
                         _mapreduceYarnApp.ParseContainersAsync();
+                        yarnLogReader.CloseFile();
                     }
                     return _mapreduceYarnApp;
                 case YarnApplicationType.Spark:
@@ -52,6 +54,8 @@ namespace YarnNinja.CommonTests
                         yarnLogReader.OpenFile(sparkLogFileName);
                         _sparkYarnApp = new(yarnLogReader);
                         _sparkYarnApp.ParseContainersAsync();
+                        yarnLogReader.CloseFile();
+
                     }
                     return _sparkYarnApp;
                 default:

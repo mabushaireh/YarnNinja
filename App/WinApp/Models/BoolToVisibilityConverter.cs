@@ -20,11 +20,11 @@ namespace YarnNinja.App.WinApp.Models
             // value is the data from the source object.
             bool thisflag = (bool)value;
             if (thisflag)
-                return Visibility.Visible;
+                return double.NaN;
 
 
             else
-                return Visibility.Collapsed;
+                return 0.0;
 
         }
 
