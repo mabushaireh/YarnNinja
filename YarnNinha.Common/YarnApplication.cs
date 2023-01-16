@@ -347,7 +347,7 @@ namespace YarnNinja.Common
                         this.Header.SubmittedDags = int.Parse(submittedDagsg.Captures[0].Value.Trim());
                         this.Header.SuccessfullDags = int.Parse(successfulDagsg.Captures[0].Value.Trim());
                         this.Header.FailedDags = int.Parse(failedDagsg.Captures[0].Value.Trim());
-                        this.Header.KilledDags = int.Parse(killedDagsg.Captures[0].Value.Trim());
+                        this.Header.KilledTasksCount = int.Parse(killedDagsg.Captures[0].Value.Trim());
                         break;
                     }
                 }
@@ -389,7 +389,22 @@ namespace YarnNinja.Common
                     }
                 }
             }
+            else if (Header.Type == YarnApplicationType.Spark) 
+            {
+                // Get all containers syslogs
+                var containerTaskslogs = new List<YarnApplicationLogLine>();
+                foreach (var container in this.Containers)
+                {
+                    var syslogLogs = container.Logs.Where(p => p.BaseLogType == LogType.stderr).FirstOrDefault().LogLines;
+                    containerTaskslogs.AddRange(syslogLogs.Where(p => p.TraceLevel == TraceLevel.INFO && (p.Module == "YarnCoarseGrainedExecutorBackend" || p.Module == "Executor") && (p.Function == "dispatcher-Executor" || p.Function.StartsWith("Executor task launch worker for task"))).ToList());
+                }
 
+                this.Header.TasksCount = containerTaskslogs.Where(p => p.Module == "YarnCoarseGrainedExecutorBackend" && p.Msg.StartsWith("Got assigned task")).Count();
+                this.Header.SuccessTasksCount = containerTaskslogs.Where(p => p.Module == "Executor" && p.Function.StartsWith("Executor task launch worker for task") && p.Msg.StartsWith("Finished task")).Count();
+                this.Header.KilledTasksCount = containerTaskslogs.Where(p => p.Module == "Executor" && p.Function.StartsWith("Executor task launch worker for task") && p.Msg.StartsWith("Executor killed task")).Count();
+                this.Header.FailedTasksCount = this.Header.TasksCount - this.Header.SuccessTasksCount - this.Header.KilledTasksCount;
+
+            }
 
             //Get containers status:
             if (this.Header.Type == YarnApplicationType.Tez)

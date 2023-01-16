@@ -71,10 +71,12 @@ namespace YarnNinja.App.WinApp.ViewModels
             get
             {
                 if (YarnApp.Header.Type == YarnApplicationType.Tez)
-                    return $"Submitted: {YarnApp.Header.SubmittedDags}, Successfull: {YarnApp.Header.SuccessfullDags}, Failed: {YarnApp.Header.FailedDags}, Killed: {YarnApp.Header.KilledDags}";
+                    return $"Submitted: {YarnApp.Header.SubmittedDags}, Successfull: {YarnApp.Header.SuccessfullDags}, Failed: {YarnApp.Header.FailedDags}, Killed: {YarnApp.Header.KilledTasksCount}";
                 else if (YarnApp.Header.Type == YarnApplicationType.MapReduce)
                     return $"Completed Mappers: {YarnApp.Header.CompletedMappers}, Completed Reducers: {YarnApp.Header.CompletedReducers}";
-                else
+                else if (YarnApp.Header.Type == YarnApplicationType.Spark)
+                    return $"Task: {YarnApp.Header.TasksCount}, Completed: {YarnApp.Header.SuccessTasksCount}, Killed: {YarnApp.Header.KilledTasksCount}, Failed: {YarnApp.Header.FailedTasksCount}";
+                else 
                 {
                     return "Not Implemented Yet";
                 }

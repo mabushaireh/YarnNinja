@@ -25,15 +25,15 @@ namespace YarnNinja.Common
 
         public string Msg { get; internal set; }
         // Sprak
-        public int TasksAssigned { get; internal set; } // YarnCoarseGrainedExecutorBackend [dispatcher-Executor]: Got assigned task
-        public int TasksSucceded { get; internal set; }
-        public int TasksFailed { get; internal set; }
-        public int TasksKilled { get; internal set; }
+        public int TasksCount { get; set; }
+        public int SuccessTasksCount { get; set; }
+        public int FailedTasksCount { get; set; }
+        public int KilledTasksCount { get; internal set; }
+
         // Tez
         public int SubmittedDags { get; internal set; }
         public int SuccessfullDags { get; internal set; }
         public int FailedDags { get; internal set; }
-        public int KilledDags { get; internal set; }
         // Mapred
         public int CompletedMappers { get; internal set; }
         public int SuccessfullMappers { get; internal set; }
@@ -47,5 +47,6 @@ namespace YarnNinja.Common
         // Core
         public string User { get; set; }
         public string QueueName { get; internal set; }
+        
     }
 }

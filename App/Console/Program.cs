@@ -349,11 +349,15 @@ namespace YarnNinja.App.Console
             newRow = dt.NewRow();
             if (app.Header.Type == YarnApplicationType.Tez)
             {
-                newRow[0] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledDags}";
+                newRow[0] = $"Submitted: {app.Header.SubmittedDags}, Successfull: {app.Header.SuccessfullDags}, Failed: {app.Header.FailedDags}, Killed: {app.Header.KilledTasksCount}";
             }
             else if (app.Header.Type == YarnApplicationType.MapReduce)
             {
                 newRow[0] = $"Completed Mappers: {app.Header.CompletedMappers}, Completed Reducers: {app.Header.CompletedReducers}";
+            }
+            else if (app.Header.Type == YarnApplicationType.Spark)
+            {
+                
             }
 
             newRow[1] = app.Header.User;

@@ -173,11 +173,29 @@ namespace YarnNinja.CommonTests
             int failsDags,
             int killedDags)
         {
-            Assert.AreEqual(expected: dagCount, actual: GetActiveYarnApp(appType)?.Header?.SubmittedDags, "Submitted Dags Id not correct!");
+            Assert.AreEqual(expected: dagCount, actual: GetActiveYarnApp(appType)?.Header?.SubmittedDags, "Submitted Dags count is not correct!");
             Assert.AreEqual(expected: succDags, actual: GetActiveYarnApp(appType)?.Header?.SuccessfullDags, "Successfull Dags is not correct!");
             Assert.AreEqual(expected: failsDags, actual: GetActiveYarnApp(appType)?.Header?.FailedDags, "Failed Dags is not correct!");
-            Assert.AreEqual(expected: killedDags, actual: GetActiveYarnApp(appType)?.Header?.KilledDags, "Killed Dags is not correct!");
+            Assert.AreEqual(expected: killedDags, actual: GetActiveYarnApp(appType)?.Header?.KilledTasksCount, "Killed Dags is not correct!");
         }
+
+
+        [TestMethod()]
+        [DataRow(YarnApplicationType.Spark,
+            1438, 1438, 0, 0,
+            DisplayName = "Correct Task counts Spark")]
+        public void YarnApplicationTest_ReturnCorrectSparkTasksCount(YarnApplicationType appType,
+            int TasksCount,
+            int SuccessTasksCount,
+            int FailedTasksCount,
+            int KilledTasksCount)
+        {
+            Assert.AreEqual(expected: TasksCount, actual: GetActiveYarnApp(appType)?.Header?.TasksCount, "Submitted Tasks Id not correct!");
+            Assert.AreEqual(expected: SuccessTasksCount, actual: GetActiveYarnApp(appType)?.Header?.SuccessTasksCount, "Successfull Tasks is not correct!");
+            Assert.AreEqual(expected: FailedTasksCount, actual: GetActiveYarnApp(appType)?.Header?.FailedTasksCount, "Failed Tasks is not correct!");
+            Assert.AreEqual(expected: KilledTasksCount, actual: GetActiveYarnApp(appType)?.Header?.KilledTasksCount, "Killed Tasks is not correct!");
+        }
+
 
         [TestMethod()]
         [DataRow(YarnApplicationType.MapReduce,
