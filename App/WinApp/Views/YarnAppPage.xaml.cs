@@ -21,6 +21,7 @@ namespace YarnNinja.App.WinApp.Views
         public YarnAppPage()
         {
             InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
 

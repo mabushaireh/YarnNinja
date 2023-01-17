@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.IO;
 using Windows.Storage;
@@ -23,7 +24,7 @@ namespace YarnNinja.App.WinApp
         public App()
         {
             this.InitializeComponent();
-            
+
 
         }
 
