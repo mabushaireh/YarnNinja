@@ -27,7 +27,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="0.8*"/>
+            <RowDefinition Height="0.05*"/>
+            <RowDefinition Height="0.75*"/>
         </Grid.RowDefinitions>
         <Grid HorizontalAlignment="Stretch"
           Background="{StaticResource SystemAccentColorBrush}"
@@ -87,49 +88,49 @@
 
         <ListView x:Name="LogTypesListView"
               Grid.Row="2" Grid.Column="0" Header="LogTypes" ItemsSource="{x:Bind ViewModel.LogTypes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Current, Mode=TwoWay}" />
-        <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Vertical">
-            <TextBlock Text="{x:Bind ViewModel.Current, Mode=OneWay}"></TextBlock>
-            <ctWinUI:DataGrid  CanUserSortColumns="True"
-                          ItemsSource="{x:Bind ViewModel.ContainersLogTypeLines, Mode=OneWay}"
-                          SelectedItem="{x:Bind ViewModel.CurrentContainerLogLine, Mode=TwoWay}"
-                      x:Name="LogLinesDataGrid" Height="Auto" Width="Auto"
-                      Margin="12" IsReadOnly="True" AllowFocusOnInteraction="True"
-                              HorizontalScrollBarVisibility="Visible" AutoGenerateColumns="False" VerticalScrollBarVisibility="Visible" GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}">
-                <ctWinUI:DataGrid.Columns>
-                    <ctWinUI:DataGridTextColumn Header="Line" Width="SizeToCells" Binding="{Binding LineNumber}"/>
-                    <ctWinUI:DataGridTextColumn Header="Timestamp" Width="SizeToCells" Binding="{Binding Timestamp}"/>
-                    <ctWinUI:DataGridTextColumn Header="TraceLevel" Width="SizeToCells" Binding="{Binding TraceLevel}"/>
-                    <ctWinUI:DataGridTextColumn Header="Function" Width="200" Binding="{Binding Function}"/>
-                    <ctWinUI:DataGridTextColumn Header="Module" Width="200" Binding="{Binding Module}"/>
-                    <ctWinUI:DataGridTextColumn Header="Message"  Width="400" Binding="{Binding Msg}">
-                        <ctWinUI:DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
-                                <Setter Property="TextBlock.TextAlignment" Value="Left"/>
-                            </Style>
-                        </ctWinUI:DataGridTextColumn.ElementStyle>
-                    </ctWinUI:DataGridTextColumn>
-                    <ctWinUI:DataGridTemplateColumn Header="Actions">
-                        <ctWinUI:DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <CommandBar Background="Transparent" DataContext="{StaticResource vm}" DefaultLabelPosition="Right">
-                                        <AppBarButton  Command="{Binding CopyCommand, Mode=OneWay}" Icon="Copy"/>
-                                        <AppBarToggleButton Command="{Binding BookmarkCommand, Mode=OneWay}" Icon="Flag"/>
-                                    </CommandBar>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ctWinUI:DataGridTemplateColumn.CellTemplate>
-                    </ctWinUI:DataGridTemplateColumn>
-                </ctWinUI:DataGrid.Columns>
-                <ctWinUI:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <TextBlock TextWrapping="Wrap" Text="{Binding Msg}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ctWinUI:DataGrid.RowDetailsTemplate>
-            </ctWinUI:DataGrid>
-        </StackPanel>
+        <TextBlock Text="{x:Bind ViewModel.Current, Mode=OneWay}" Grid.Column="1" Grid.Row="1"  ></TextBlock>
+        <ctWinUI:DataGrid  Grid.Column="1" Grid.Row="2"  CanUserSortColumns="True"
+                Height="Auto" Width="Auto" Margin="12" Padding="5"
+                AutoGenerateColumns="False"
+                IsReadOnly="True" 
+                HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" 
+                GridLinesVisibility="All" AlternatingRowBackground="{StaticResource SystemAccentColorBrush}" 
+               
+                x:Name="LogLinesDataGrid" >
+            <ctWinUI:DataGrid.Columns>
+                <ctWinUI:DataGridTextColumn Header="Line" Width="SizeToCells" Binding="{Binding LineNumber}"/>
+                <ctWinUI:DataGridTextColumn Header="Timestamp" Width="SizeToCells" Binding="{Binding Timestamp}"/>
+                <ctWinUI:DataGridTextColumn Header="TraceLevel" Width="SizeToCells" Binding="{Binding TraceLevel}"/>
+                <ctWinUI:DataGridTextColumn Header="Function" Width="200" Binding="{Binding Function}"/>
+                <ctWinUI:DataGridTextColumn Header="Module" Width="200" Binding="{Binding Module}"/>
+                <ctWinUI:DataGridTextColumn Header="Message"  Width="400" Binding="{Binding Msg}">
+                    <ctWinUI:DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                        </Style>
+                    </ctWinUI:DataGridTextColumn.ElementStyle>
+                </ctWinUI:DataGridTextColumn>
+                <ctWinUI:DataGridTemplateColumn Header="Actions">
+                    <ctWinUI:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <CommandBar Background="Transparent" DataContext="{StaticResource vm}" DefaultLabelPosition="Right">
+                                    <AppBarButton  Command="{Binding CopyCommand, Mode=OneWay}" Icon="Copy"/>
+                                    <AppBarToggleButton Command="{Binding BookmarkCommand, Mode=OneWay}" Icon="Flag"/>
+                                </CommandBar>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ctWinUI:DataGridTemplateColumn.CellTemplate>
+                </ctWinUI:DataGridTemplateColumn>
+            </ctWinUI:DataGrid.Columns>
+            <ctWinUI:DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Msg}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ctWinUI:DataGrid.RowDetailsTemplate>
+        </ctWinUI:DataGrid>
     </Grid>
 </Page>

@@ -89,7 +89,7 @@ namespace YarnNinja.Common
                     else
                     {
                         allLogs = GetLogsByBaseType(LogType.stderr).Where(p => p.Timestamp != DateTime.MinValue ).ToList();
-                        allLogs.AddRange(GetLogsByBaseType(LogType.stdout));
+                        allLogs.AddRange(GetLogsByBaseType(LogType.stdout).Where(p => p.Timestamp != DateTime.MinValue).ToList());
                     }
 
                     if (allLogs.Count > 0)

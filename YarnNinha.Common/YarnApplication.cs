@@ -396,7 +396,7 @@ namespace YarnNinja.Common
                 foreach (var container in this.Containers)
                 {
                     var syslogLogs = container.Logs.Where(p => p.BaseLogType == LogType.stderr).FirstOrDefault().LogLines;
-                    containerTaskslogs.AddRange(syslogLogs.Where(p => p.TraceLevel == TraceLevel.INFO && (p.Module == "YarnCoarseGrainedExecutorBackend" || p.Module == "Executor") && (p.Function == "dispatcher-Executor" || p.Function.StartsWith("Executor task launch worker for task"))).ToList());
+                    containerTaskslogs.AddRange(syslogLogs.Where(p => p.TraceLevel == TraceLevel.INFO && (p.Module == "YarnCoarseGrainedExecutorBackend" || p.Module == "Executor" || p.Module == "CoarseGrainedExecutorBackend") && (p.Function == "dispatcher-Executor" || p.Function.StartsWith("dispatcher-event-loop-") || p.Function.StartsWith("Executor task launch worker for task"))).ToList());
                 }
 
                 this.Header.TasksCount = containerTaskslogs.Where(p => p.Module == "YarnCoarseGrainedExecutorBackend" && p.Msg.StartsWith("Got assigned task")).Count();

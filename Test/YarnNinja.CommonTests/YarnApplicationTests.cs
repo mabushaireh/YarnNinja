@@ -72,6 +72,7 @@ namespace YarnNinja.CommonTests
 
 
         [TestMethod()]
+        [Ignore]
         [DataRow("C:\\Users\\maabusha.MIDDLEEAST.000\\Downloads\\application_1671046156402_3288.log\\application_1671046156402_3288.log", DisplayName = "Big File Parse Expected")]
         public void YarnApplication_BigFileParse(string filePath)
         {
