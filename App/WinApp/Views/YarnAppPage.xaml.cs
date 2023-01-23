@@ -45,8 +45,6 @@ namespace YarnNinja.App.WinApp.Views
             ContainersDataGrid.ItemsSource = null;
             ContainersDataGrid.ItemsSource = ViewModel.Containers;
 
-
-
             base.OnNavigatedTo(e);
         }
 
@@ -58,7 +56,6 @@ namespace YarnNinja.App.WinApp.Views
         }
 
         public ICommand CloseCommand => new AsyncRelayCommand(CloseYarnApp);
-        //public ICommand OpenContainersCommand => new AsyncRelayCommand(OpenEditDialog);
 
 
 
@@ -73,17 +70,6 @@ namespace YarnNinja.App.WinApp.Views
                 ContainersDataGrid.ItemsSource = ViewModel.Containers;
                 ContainersDataGrid.SelectedItem = (ViewModel.Containers.Count > 0? ViewModel.Containers[0] : null);
             }
-        }
-
-        private void ListViewItem_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
-            {
-            }
-        }
-
-        private void ListViewItem_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
         }
 
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)

@@ -12,7 +12,20 @@ namespace YarnNinja.App.WinApp.ViewModels
     {
         private string current;
 
-        public YarnApplication YarnApp { get; set; }
+        private YarnApplication yarnApp = null;
+
+        public YarnApplication YarnApp
+        {
+            get
+            { 
+                return yarnApp; 
+            }
+            set
+            {
+                yarnApp = value;
+                OnPropertyChanged("");
+            }
+        }
         public YarnAppPageViewModel()
         {
 
@@ -76,7 +89,7 @@ namespace YarnNinja.App.WinApp.ViewModels
                     return $"Completed Mappers: {YarnApp.Header.CompletedMappers}, Completed Reducers: {YarnApp.Header.CompletedReducers}";
                 else if (YarnApp.Header.Type == YarnApplicationType.Spark)
                     return $"Task: {YarnApp.Header.TasksCount}, Completed: {YarnApp.Header.SuccessTasksCount}, Killed: {YarnApp.Header.KilledTasksCount}, Failed: {YarnApp.Header.FailedTasksCount}";
-                else 
+                else
                 {
                     return "Not Implemented Yet";
                 }
