@@ -11,9 +11,13 @@
       "commandName": "Project",
       "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647184687608_0039_mapred.log\""
     },
-    "Debug with Spark": {
+    "Debug with Spark - Success": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\1648899966078_0027_spark.log\""
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\1648899966078_0027_spark_Succeeded.log\""
+    },
+    "Debug with Spark - Failed": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1674817533297_50757_spark_Faild.log\""
     }
   }
 }

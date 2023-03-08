@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0-preview-20221221-03" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
     <PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
     <PackageReference Include="coverlet.collector" Version="3.2.0">
@@ -26,13 +26,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\Samples\1648899966078_0027_spark.log" Link="Samples\1648899966078_0027_spark.log">
+    <None Include="..\..\Samples\1648899966078_0027_spark_Succeeded.log" Link="Samples\1648899966078_0027_spark_Succeeded.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\Samples\application_1639352826059_8646_tez.log" Link="Samples\application_1639352826059_8646_tez.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\Samples\application_1647184687608_0039_mapred.log" Link="Samples\application_1647184687608_0039_mapred.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Samples\application_1674817533297_50757_spark_Faild.log" Link="Samples\application_1674817533297_50757_spark_Faild.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\Samples\FakeFile.log" Link="Samples\FakeFile.log">

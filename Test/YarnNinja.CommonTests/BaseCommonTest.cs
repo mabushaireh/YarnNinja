@@ -15,7 +15,7 @@ namespace YarnNinja.CommonTests
     {
         protected const string tezLogFileName = @"./Samples/application_1639352826059_8646_tez.log";
         protected const string mapreduceLogFileName = "./Samples/application_1647184687608_0039_mapred.log";
-        protected const string sparkLogFileName = "./Samples/1648899966078_0027_spark.log";
+        protected const string sparkLogFileName = "./Samples/1648899966078_0027_spark_Succeeded.log";
 
         private static YarnApplication? _tezYarnApp;
         private static YarnApplication? _mapreduceYarnApp;

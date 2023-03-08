@@ -9,10 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{73E51C61-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EA18273F-57B4-4D5A-B98C-7DAE02F54382}"
 	ProjectSection(SolutionItems) = preProject
-		Samples\1648899966078_0027_spark.log = Samples\1648899966078_0027_spark.log
 		Samples\application_1639352826059_8646_tez.log = Samples\application_1639352826059_8646_tez.log
+		Samples\1648899966078_0027_spark_Succeeded.log = Samples\1648899966078_0027_spark_Succeeded.log
 		Samples\application_1647184687608_0039_mapred.log = Samples\application_1647184687608_0039_mapred.log
 		Samples\FakeFile.log = Samples\FakeFile.log
+		Samples\application_1674817533297_50757_spark_Faild.log = Samples\application_1674817533297_50757_spark_Faild.log
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YarnNinja.Common", "YarnNinha.Common\YarnNinja.Common.csproj", "{DBF83177-3B75-42A2-B019-BE22FADD5300}"
