@@ -5,19 +5,19 @@
     },
     "Debug with Tez-Success": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1639352826059_8646_tez.log\""
+      "commandLineArgs": "\"D:\\YarnNinja\\Samples\\application_1639352826059_8646_tez.log\""
     },
     "Debug with mapred-Success": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1647184687608_0039_mapred.log\""
+      "commandLineArgs": "\"D:\\YarnNinja\\Samples\\application_1647184687608_0039_mapred.log\""
     },
     "Debug with Spark - Success": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\1648899966078_0027_spark_Succeeded.log\""
+      "commandLineArgs": "\"D:\\YarnNinja\\Samples\\1648899966078_0027_spark_Succeeded.log\""
     },
     "Debug with Spark - Failed": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Repos\\YarnNinja\\Samples\\application_1674817533297_50757_spark_Faild.log\""
+      "commandLineArgs": "\"D:\\YarnNinja\\Samples\\application_1674817533297_50757_spark_Faild.log\""
     }
   }
 }
