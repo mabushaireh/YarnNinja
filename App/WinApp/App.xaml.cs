@@ -1,8 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.IO;
-using Windows.Storage;
+
 using YarnNinja.App.WinApp.Services;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -56,7 +55,10 @@ namespace YarnNinja.App.WinApp
             shell.Activate();
 
             WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(shell);
-            PInvoke.User32.ShowWindow(WindowHandle, PInvoke.User32.WindowShowStyle.SW_MAXIMIZE);
+            // using microsoft.windows.cs.win32 to do Pinvoke
+
+            PInvoke.
+            //PInvoke.User32.ShowWindow(WindowHandle, PInvoke.User32.WindowShowStyle.SW_MAXIMIZE);
         }
 
         public static IntPtr WindowHandle { get; private set; }

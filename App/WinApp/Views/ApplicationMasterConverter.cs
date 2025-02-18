@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
-using CommunityToolkit.WinUI.UI.Converters;
 using YarnNinja.Common;
 
 namespace YarnNinja.App.WinApp.Views
